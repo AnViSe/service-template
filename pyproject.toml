@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "srv-template"
+version = "0.1.0"
+description = "Service template"
+authors = ["AnViSe <anvise@grodno.belpost.by>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "0.115.*"
+dishka = "^1.4.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

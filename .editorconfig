@@ -1,0 +1,18 @@
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Python
+[*.py]
+indent_size = 4
+ij_python_optimize_imports_sort_imports = true
+ij_python_optimize_imports_sort_names_in_from_imports = true
+ij_python_optimize_imports_case_insensitive_order = true
+ij_python_optimize_imports_sort_by_type_first = true
+ij_python_optimize_imports_always_split_from_imports = false
+ij_python_optimize_imports_join_from_imports_with_same_source = true
