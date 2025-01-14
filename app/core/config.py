@@ -53,7 +53,7 @@ class PostgresConfig(BaseSettings):
 
     host: str = Field(default='localhost', init=False)
     port: int = Field(default=5432, init=False)
-    name: str = Field(init=False)
+    name: str = Field(default='srn-template', init=False)
     user: str | None = Field(default=None, init=False)
     password: SecretStr | None = Field(default=None, init=False)
 
@@ -73,7 +73,7 @@ class RedisConfig(BaseSettings):
 
     host: str = Field(default='localhost', init=False)
     port: int = Field(default=6379, init=False)
-    name: str | int = Field(default=10, init=False)
+    name: str | int = Field(default=0, init=False)
     ssl: bool = Field(default=False, init=False)
     user: str | None = Field(default=None, init=False)
     password: SecretStr | None = Field(default=None, init=False)
@@ -93,10 +93,13 @@ class RedisConfig(BaseSettings):
 class BusConfig(RedisConfig):
     model_config = env_model_config(env_prefix='DB_BUS_')
 
+    name: str | int = Field(default=10, init=False)
+
 
 class CacheConfig(RedisConfig):
     model_config = env_model_config(env_prefix='DB_CACHE_')
 
+    name: str | int = Field(default=11, init=False)
 
 class Config(BaseModel):
     app: AppConfig = Field(default_factory=lambda: AppConfig())

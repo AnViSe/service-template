@@ -38,4 +38,4 @@ class PermissionFullDto(StatusModelMixin, DtCrUpModelMixin, BasePermission, IDMo
 #     records: int = RecordsField
 #     results: list[PermissionDto]
 
-PermissionsDTO: TypeAlias = PaginatedItemsDTO[PermissionDto]
+PermissionsDto: TypeAlias = PaginatedItemsDTO[PermissionDto]
