@@ -1,2 +1,106 @@
-class Config:
-    pass
+from functools import partial
+from pathlib import Path
+
+from pydantic import BaseModel, Field, PostgresDsn, RedisDsn, SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+env_model_config = partial(
+    SettingsConfigDict,
+    env_file='.env',
+    env_file_encoding='utf-8',
+    extra='ignore',
+)
+
+class LoggingConfig(BaseSettings):
+    model_config = env_model_config(env_prefix='LOG_')
+
+    level: str = Field(default='DEBUG', init=False)
+    logger_name: str = Field(default='srv-base', init=False)
+
+    file_path: Path = Field(default='logs', init=False)
+    file_name: str = Field(default='service.log', init=False)
+    file_size: int = Field(default=5, init=False)
+    file_count: int = Field(default=10, init=False)
+
+    json_format: bool = Field(default=False, init=False)
+
+    echo_sql: bool = Field(default=True, init=False)
+
+
+class AppConfig(BaseSettings):
+    model_config = env_model_config(env_prefix='APP_')
+
+    debug: bool = Field(default=True, init=False)
+    version: str = Field(default='0.0.1', init=False)
+    title: str = Field(default='Application Title', init=False)
+    description: str | None = Field(default=None, init=False)
+    api_url: str = Field(default='/api/v1/srv', init=False)
+    bus_group: str = Field(default='srv-template', init=False)
+
+    app_id: int = Field(default=0, init=False)
+
+    @property
+    def openapi_url(self) -> str:
+        return f'{self.api_url}/openapi.json'
+
+    @property
+    def consumer_name(self) -> str:
+        return f'{self.bus_group}-{self.app_id}'
+
+
+class PostgresConfig(BaseSettings):
+    model_config = env_model_config(env_prefix='DB_MAIN_')
+
+    host: str = Field(default='localhost', init=False)
+    port: int = Field(default=5432, init=False)
+    name: str = Field(init=False)
+    user: str | None = Field(default=None, init=False)
+    password: SecretStr | None = Field(default=None, init=False)
+
+    @property
+    def dsn(self) -> PostgresDsn:
+        return PostgresDsn.build(
+            scheme='postgresql+asyncpg',
+            username=self.user,
+            password=self.password.get_secret_value() if self.password else None,
+            host=self.host,
+            port=self.port,
+            path=self.name,
+        )
+
+
+class RedisConfig(BaseSettings):
+
+    host: str = Field(default='localhost', init=False)
+    port: int = Field(default=6379, init=False)
+    name: str | int = Field(default=10, init=False)
+    ssl: bool = Field(default=False, init=False)
+    user: str | None = Field(default=None, init=False)
+    password: SecretStr | None = Field(default=None, init=False)
+
+    @property
+    def dsn(self) -> RedisDsn:
+        return RedisDsn.build(
+            scheme='rediss' if self.ssl else 'redis',
+            username=self.user,
+            password=self.password.get_secret_value() if self.password else None,
+            host=self.host,
+            port=self.port,
+            path=f"/{self.name}"
+        )
+
+
+class BusConfig(RedisConfig):
+    model_config = env_model_config(env_prefix='DB_BUS_')
+
+
+class CacheConfig(RedisConfig):
+    model_config = env_model_config(env_prefix='DB_CACHE_')
+
+
+class Config(BaseModel):
+    app: AppConfig = Field(default_factory=lambda: AppConfig())
+    postgres: PostgresConfig = Field(default_factory=lambda: PostgresConfig())
+    bus: BusConfig = Field(default_factory=lambda: BusConfig())
+    cache: CacheConfig = Field(default_factory=lambda: CacheConfig())
+    logging: LoggingConfig = Field(default_factory=lambda: LoggingConfig())
