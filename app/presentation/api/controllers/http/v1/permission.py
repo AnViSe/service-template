@@ -1,10 +1,14 @@
+import logging
+
 from fastapi import APIRouter, status
 
-from app.controllers.http.v1.requests.permission import PermissionCreateRequest
-from app.controllers.http.v1.responses.base import DeleteResultSuccess
 from app.domain.permission.dto.permission import PermissionDataDto, PermissionFullDto, PermissionsDto
+from .requests.permission import PermissionCreateRequest
+from .responses.base import DeleteResultSuccess
 
 router = APIRouter(prefix='/permissions', tags=['Разрешения'])
+
+logger = logging.getLogger('http.v1.permission')
 
 
 @router.get(
@@ -70,4 +74,5 @@ async def update_permission(
 async def delete_permission(
     item_id: int,
 ) -> DeleteResultSuccess:
-    return DeleteResultSuccess()
+    logger.debug('Permission deleted', extra={'item_id': item_id})
+    return DeleteResultSuccess(info={'id': item_id})

@@ -5,10 +5,11 @@ from fastapi import FastAPI
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html, get_swagger_ui_oauth2_redirect_html
 from fastapi.staticfiles import StaticFiles
 
-from app.controllers import http
 from app.core.config import Config
+from app.presentation import api
 
 logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -70,6 +71,7 @@ class FastAPIApp:
 
     def initialize(self) -> 'FastAPIApp':
         self.set_static()
-        # http.setup_handlers(self.app)
-        self.app.include_router(http.router, prefix=self.config.app.api_url)
+        api.setup_handlers(self.app)
+        api.setup_middlewares(self.app)
+        self.app.include_router(api.router, prefix=self.config.app.api_url)
         return self

@@ -16,6 +16,8 @@ structlog = "^24.4.0"
 redis = "^5.2.1"
 asyncpg = "^0.30.0"
 alembic = "^1.14.0"
+uuid6 = "^2024.7.10"
+orjson = "^3.10.14"
 
 
 [build-system]

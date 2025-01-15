@@ -11,18 +11,19 @@ env_model_config = partial(
     extra='ignore',
 )
 
+
 class LoggingConfig(BaseSettings):
     model_config = env_model_config(env_prefix='LOG_')
 
     level: str = Field(default='DEBUG', init=False)
-    logger_name: str = Field(default='srv-base', init=False)
+    logger_name: str = Field(default='srv-template', init=False)
 
     file_path: Path = Field(default='logs', init=False)
     file_name: str = Field(default='service.log', init=False)
     file_size: int = Field(default=5, init=False)
     file_count: int = Field(default=10, init=False)
 
-    json_format: bool = Field(default=False, init=False)
+    json_format: bool = Field(default=True, init=False)
 
     echo_sql: bool = Field(default=True, init=False)
 
@@ -53,7 +54,7 @@ class PostgresConfig(BaseSettings):
 
     host: str = Field(default='localhost', init=False)
     port: int = Field(default=5432, init=False)
-    name: str = Field(default='srn-template', init=False)
+    name: str = Field(default='srv-template', init=False)
     user: str | None = Field(default=None, init=False)
     password: SecretStr | None = Field(default=None, init=False)
 
@@ -109,6 +110,7 @@ class CacheConfig(RedisConfig):
     model_config = env_model_config(env_prefix='DB_CACHE_')
 
     name: str | int = Field(default=11, init=False)
+
 
 class Config(BaseModel):
     app: AppConfig = Field(default_factory=lambda: AppConfig())
