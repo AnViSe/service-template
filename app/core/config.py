@@ -68,6 +68,15 @@ class PostgresConfig(BaseSettings):
             path=self.name,
         )
 
+    def url(self, async_fallback: bool = False) -> str:
+        url = f'postgresql+asyncpg://{self.user}'
+        if self.password:
+            url += f':{self.password.get_secret_value()}'
+        url += f'@{self.host}:{self.port}/{self.name}'
+        if async_fallback:
+            url += '?async_fallback=True'
+        return url
+
 
 class RedisConfig(BaseSettings):
 

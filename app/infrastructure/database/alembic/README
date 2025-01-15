@@ -1,0 +1,9 @@
+Generic single-database configuration.
+
+alembic revision --autogenerate -m "Init"
+
+alembic upgrade head
+
+alembic downgrade base
+
+python initial_data.py
