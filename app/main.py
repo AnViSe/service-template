@@ -1,4 +1,5 @@
 from dishka import AsyncContainer, make_async_container
+from dishka.integrations import fastapi as fastapi_integration
 
 from app.core.config import Config
 from app.core.ioc import AppProvider
@@ -20,7 +21,7 @@ def make_container() -> AsyncContainer:
 
 
 def setup_fastapi() -> FastAPIApp:
-    # container = make_container()
+    container = make_container()
     fastapi_app = FastAPIApp(config).initialize()
-    # fastapi_integration.setup_dishka(container, fastapi_app.app)
+    fastapi_integration.setup_dishka(container, fastapi_app.app)
     return fastapi_app

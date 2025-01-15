@@ -1,10 +1,11 @@
 from sqlalchemy import Index, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from .base import Base, bool_status, datetime_cr, datetime_up, int_pk_always_true
+from app.domain.permission.model import PermissionModel
+from .base import bool_status, DatabaseModel, datetime_cr, datetime_up, int_pk_always_true
 
 
-class PermissionDB(Base):
+class PermissionDB(DatabaseModel):
     """Табличная модель Разрешение"""
 
     __tablename__ = 'permissions'
@@ -18,3 +19,25 @@ class PermissionDB(Base):
     dt_cr: Mapped[datetime_cr]
     dt_up: Mapped[datetime_up]
     status: Mapped[bool_status]
+
+    def to_domain_model(self) -> PermissionModel:
+        return PermissionModel(
+            id=self.id,
+            perm_code=self.perm_code,
+            perm_name=self.perm_name,
+            perm_desc=self.perm_desc,
+            dt_cr=self.dt_cr,
+            dt_up=self.dt_up,
+            status=self.status
+        )
+
+    def create_from_domain_model(self, model: PermissionModel) -> 'PermissionDB':
+        return PermissionDB(
+            id=model.id,
+            perm_code=model.perm_code,
+            perm_name=model.perm_name,
+            perm_desc=model.perm_desc,
+            dt_cr=model.dt_cr,
+            dt_up=model.dt_up,
+            status=model.status,
+        )
