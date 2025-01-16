@@ -6,7 +6,6 @@ from app.domain.common.dto.base import (
     IDModelMixin,
     StatusModelMixin,
 )
-from app.domain.common.dto.helper import RecordsField, SkipField
 from app.domain.common.dto.pagination import PaginatedItemsDTO
 from app.domain.permission.dto.helper import PermCodeField, PermDescOptionalField, PermNameField
 
@@ -32,10 +31,5 @@ class PermissionDto(StatusModelMixin, DtCrUpModelMixin, BasePermission, IDModelM
 class PermissionFullDto(StatusModelMixin, DtCrUpModelMixin, BasePermission, IDModelMixin):
     ...
 
-
-# class PermissionsDto(DTO):
-#     skip: int = SkipField
-#     records: int = RecordsField
-#     results: list[PermissionDto]
 
 PermissionsDto: TypeAlias = PaginatedItemsDTO[PermissionDto]

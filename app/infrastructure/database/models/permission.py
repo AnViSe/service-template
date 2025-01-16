@@ -2,7 +2,14 @@ from sqlalchemy import Index, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.domain.permission.model import PermissionModel
-from .base import bool_status, DatabaseModel, datetime_cr, datetime_up, int_pk_always_true
+from app.infrastructure.database.models import (
+    Base,
+    bool_status,
+    DatabaseModel,
+    datetime_cr,
+    datetime_up,
+    int_pk_always_true,
+)
 
 
 class PermissionDB(DatabaseModel):
@@ -12,13 +19,16 @@ class PermissionDB(DatabaseModel):
     __table_args__ = (Index('permissions_uq_perm_code', text('lower(perm_code)'), unique=True),)
 
     id: Mapped[int_pk_always_true]
-    perm_code = mapped_column(String(100), nullable=False, comment='Код разрешения')
+    perm_code: Mapped[str] = mapped_column(String(100), nullable=False, comment='Код разрешения')
     perm_name: Mapped[str] = mapped_column(String(150), nullable=False, comment='Имя разрешения')
-    perm_desc = mapped_column(String(200), nullable=True, comment='Описание разрешения')
+    perm_desc: Mapped[str | None] = mapped_column(String(200), nullable=True, comment='Описание разрешения')
 
-    dt_cr: Mapped[datetime_cr]
-    dt_up: Mapped[datetime_up]
-    status: Mapped[bool_status]
+    # dt_cr: Mapped[datetime_cr]
+    # dt_up: Mapped[datetime_up]
+    # status: Mapped[bool_status]
+
+    def get_id(self) -> int | None:
+        return self.id
 
     def to_domain_model(self) -> PermissionModel:
         return PermissionModel(
@@ -31,7 +41,8 @@ class PermissionDB(DatabaseModel):
             status=self.status
         )
 
-    def create_from_domain_model(self, model: PermissionModel) -> 'PermissionDB':
+    @staticmethod
+    def create_from_domain_model(model: PermissionModel) -> 'PermissionDB':
         return PermissionDB(
             id=model.id,
             perm_code=model.perm_code,

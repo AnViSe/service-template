@@ -10,6 +10,7 @@ trim_trailing_whitespace = true
 # Python
 [*.py]
 indent_size = 4
+max_line_length = 120
 ij_python_optimize_imports_sort_imports = true
 ij_python_optimize_imports_sort_names_in_from_imports = true
 ij_python_optimize_imports_case_insensitive_order = true

@@ -38,7 +38,7 @@ class AppConfig(BaseSettings):
     api_url: str = Field(default='/api/v1/srv', init=False)
     bus_group: str = Field(default='srv-template', init=False)
 
-    app_id: int = Field(default=0, init=False)
+    app_id: int | None = Field(default=None, init=False)
 
     @property
     def openapi_url(self) -> str:

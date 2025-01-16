@@ -12,10 +12,3 @@ class PermissionCreateRequest(BaseModel):
     # roles: list[int] | None
     status: bool = StatusField
 
-# class PermissionUpdateRequest(BaseModel):
-#     code: str | None = helper.CodeOptionalField
-#     name: str | None = helper.NameOptionalField
-#     comment: str | None = helper.CommentOptionalField
-#     users: list[int] | None
-#     roles: list[int] | None
-#     status: bool | None = StatusOptionalField

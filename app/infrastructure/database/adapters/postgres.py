@@ -3,6 +3,7 @@ from typing import Self
 from pydantic import PostgresDsn
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncEngine, AsyncSession, create_async_engine
 
+from app.infrastructure.database.repositories.permission import PermissionRepository
 from app.utils.singleton import Singleton
 
 
@@ -23,6 +24,7 @@ class PostgresDB(metaclass=Singleton):
         if self.__engine is None:
             self.__engine = create_async_engine(
                 self.__pg_dsn.unicode_string(),
+                pool_pre_ping=True,
                 echo=self.__echo,
             )
 
@@ -38,8 +40,7 @@ class PostgresDB(metaclass=Singleton):
 
     async def __set_repositories(self) -> None:
         if self.__session_maker is not None:
-            # self.user = repos.UserRepo(self.__session_maker)
-            pass
+            self.permission = PermissionRepository(self.__session_maker)
 
     async def __aenter__(self) -> Self:
         await self.__set_async_engine()

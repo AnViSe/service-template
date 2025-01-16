@@ -2,7 +2,11 @@ import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html, get_swagger_ui_oauth2_redirect_html
+from fastapi.openapi.docs import (
+    get_redoc_html,
+    get_swagger_ui_html,
+    get_swagger_ui_oauth2_redirect_html,
+)
 from fastapi.staticfiles import StaticFiles
 
 from app.core.config import Config
@@ -35,7 +39,8 @@ class FastAPIApp:
             redoc_url=None,
             lifespan=lifespan,
         )
-        config.app.app_id = id(self.app)
+        if config.app.app_id is None:
+            config.app.app_id = id(self.app)
         self.config = config
 
     def set_static(self):

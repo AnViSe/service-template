@@ -11,7 +11,8 @@ def setup_handlers(app: FastAPI):
     app.add_exception_handler(CustomException, handlers.custom_exc_handler)  # type: ignore
     app.add_exception_handler(SQLAlchemyError, handlers.sql_exc_handler)  # type: ignore
     app.add_exception_handler(PostgresError, handlers.sql_exc_handler)  # type: ignore
-    app.add_exception_handler(Exception, handlers.exc_handler)
+    app.add_exception_handler(OSError, handlers.os_exc_handler)  # type: ignore
+    app.add_exception_handler(Exception, handlers.default_exc_handler)
 
 
 router = APIRouter()

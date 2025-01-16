@@ -1,8 +1,16 @@
 import logging
 
+from dishka import FromDishka
+from dishka.integrations.fastapi import inject
 from fastapi import APIRouter, status
 
-from app.domain.permission.dto.permission import PermissionDataDto, PermissionFullDto, PermissionsDto
+from app.domain.common.usecases import Services
+from app.domain.permission.dto.permission import (
+    PermissionDataDto,
+    PermissionFullDto,
+    PermissionsDto,
+    PermissionUpdateDto,
+)
 from .requests.permission import PermissionCreateRequest
 from .responses.base import DeleteResultSuccess
 
@@ -18,11 +26,17 @@ logger = logging.getLogger('http.v1.permission')
     summary='Список разрешений',
     description='Получение списка разрешений',
 )
-async def get_permissions() -> PermissionsDto:
-    return PermissionsDto(
+@inject
+async def get_permissions(
+    service: FromDishka[Services],
+) -> PermissionsDto:
+    return await service.permission.get_many(
+        gt=0,
         skip=0,
-        records=0,
-        results=[],
+        limit=10,
+        sort='id',
+        search=None,
+        filters=None,
     )
 
 
@@ -33,10 +47,12 @@ async def get_permissions() -> PermissionsDto:
     summary='Получение информации о разрешении',
     description='Получение информации о разрешении',
 )
+@inject
 async def get_permission(
     item_id: int,
+    service: FromDishka[Services],
 ) -> PermissionFullDto:
-    return PermissionFullDto()
+    return await service.permission.get_one(item_id)
 
 
 @router.post(
@@ -46,8 +62,12 @@ async def get_permission(
     summary='Создание нового разрешения',
     description='Создание нового разрешения',
 )
-async def create_permission(data: PermissionCreateRequest) -> PermissionFullDto:
-    return PermissionFullDto()
+@inject
+async def create_permission(
+    data: PermissionCreateRequest,
+    service: FromDishka[Services],
+) -> PermissionFullDto:
+    return await service.permission.create(PermissionDataDto(**data.model_dump()))
 
 
 @router.put(
@@ -57,11 +77,13 @@ async def create_permission(data: PermissionCreateRequest) -> PermissionFullDto:
     summary='Изменение разрешения',
     description='Изменение разрешения',
 )
+@inject
 async def update_permission(
     item_id: int,
     item_data: PermissionDataDto,
+    service: FromDishka[Services],
 ) -> PermissionFullDto:
-    return PermissionFullDto()
+    return await service.permission.update(PermissionUpdateDto(id=item_id, update_data=item_data))
 
 
 @router.delete(
@@ -71,8 +93,12 @@ async def update_permission(
     summary='Удаление разрешения',
     description='Удаление разрешения',
 )
+@inject
 async def delete_permission(
     item_id: int,
+    service: FromDishka[Services],
 ) -> DeleteResultSuccess:
+    logger.debug('Permission deleting', extra={'item_id': item_id})
+    await service.permission.delete(item_id)
     logger.debug('Permission deleted', extra={'item_id': item_id})
-    return DeleteResultSuccess(info={'id': item_id})
+    return DeleteResultSuccess(detail={'id': item_id})

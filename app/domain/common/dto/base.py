@@ -7,9 +7,6 @@ from app.domain.common.dto.helper import (
     DtUpField,
     IdField,
     IdWithZeroField,
-    ItemsOptionalField,
-    # LastLoginOptionalField,
-    # SDNameOptionalField,
     StatusField,
 )
 
