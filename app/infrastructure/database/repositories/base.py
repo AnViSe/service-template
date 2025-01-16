@@ -330,7 +330,7 @@ class BaseRepository(Generic[AbstractDatabaseModel], metaclass=ABCMeta):
     async def delete(self, item_id: int) -> None:
         sql = delete(self.database_model).where(and_(self.database_model.id == item_id)).returning(
             self.database_model.id
-            )
+        )
         async with self.session.begin() as session:
             item = await session.scalar(sql)
             if not item:
@@ -340,10 +340,11 @@ class BaseRepository(Generic[AbstractDatabaseModel], metaclass=ABCMeta):
 
     @staticmethod
     def _parse_error(err: DBAPIError, model: AbstractDomainModel) -> None:
+        # logger.error('BaseRepository _parse_error', extra={'error': repr(err)})
         match err.__cause__.__cause__.constraint_name:  # type: ignore
             # case "pk_users":
             #     raise UserIdAlreadyExistsError(user.id.to_raw()) from err
             # case "uq_users_username":
             #     raise UsernameAlreadyExistsError(str(user.username)) from err
             case _:
-                raise ConflictException from err
+                raise err

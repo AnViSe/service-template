@@ -1,3 +1,4 @@
+import logging
 from typing import TYPE_CHECKING
 
 from pydantic import TypeAdapter
@@ -14,6 +15,7 @@ from app.domain.permission.model import PermissionModel
 if TYPE_CHECKING:
     from app.domain.common.usecases import Services
 
+logger = logging.getLogger(__name__)
 
 class PermissionService:
 

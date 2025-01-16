@@ -20,7 +20,6 @@ def custom_exc_handler(_: Request, exception: CustomException) -> JSONResponse:
 
 
 def sql_exc_handler(_: Request, exception: sa_exc.SQLAlchemyError | apg_exc.PostgresError) -> JSONResponse:
-    # logger.error('Handle SQL error', exc_info=exception)
     logger.error('Handle SQL error', extra={'error': repr(exception)})
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -30,7 +29,6 @@ def sql_exc_handler(_: Request, exception: sa_exc.SQLAlchemyError | apg_exc.Post
 
 def os_exc_handler(_: Request, exception: OSError) -> JSONResponse:
     logger.error('Handle error', extra={'error': repr(exception)})
-    # logger.exception('Unknown exception occurred', exc_info=exception)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content=dict(
@@ -41,9 +39,7 @@ def os_exc_handler(_: Request, exception: OSError) -> JSONResponse:
 
 
 def default_exc_handler(_: Request, exception: Exception) -> JSONResponse:
-    # logger.error('Handle error', exc_info=exception, extra={'error': exception})
     logger.error('Handle error', extra={'error': repr(exception)})
-    # logger.exception('Unknown exception occurred', exc_info=exception, extra={'error': exception})
     logger.exception('Unknown exception occurred', extra={'error': repr(exception)})
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

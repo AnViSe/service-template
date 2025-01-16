@@ -1,12 +1,16 @@
+import logging
+
 from sqlalchemy import select
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from app.domain.common.exceptions import NotFoundException
-from app.domain.permission.exceptions import AlreadyExists, NotFound
+from app.domain.common.exceptions import ConflictException, NotFoundException
+from app.domain.permission.exceptions import NotFound, PermissionCodeAlreadyExists, PermissionIdAlreadyExists
 from app.domain.permission.model import PermissionModel
 from app.infrastructure.database.models.permission import PermissionDB
 from app.infrastructure.database.repositories.base import BaseRepository
+
+logger = logging.getLogger('repository.permission')
 
 
 class PermissionRepository(BaseRepository[PermissionDB]):
@@ -16,7 +20,7 @@ class PermissionRepository(BaseRepository[PermissionDB]):
     async def retrieve_many(self, **kwargs):
         self.order_fields = [f'{PermissionDB.__tablename__}.id']
 
-        _sql = (
+        sql = (
             select(
                 PermissionDB.id,
                 PermissionDB.perm_code,
@@ -28,7 +32,7 @@ class PermissionRepository(BaseRepository[PermissionDB]):
             )
         )
 
-        return await self.select_data(_sql, **kwargs)
+        return await self.select_data(sql, **kwargs)
 
     async def delete(self, item_id: int) -> None:
         try:
@@ -38,10 +42,11 @@ class PermissionRepository(BaseRepository[PermissionDB]):
 
     @staticmethod
     def _parse_error(err: DBAPIError, model: PermissionModel) -> None:
-        match err.__cause__.__cause__.constraint_name:  # type: ignore
-            # case "pk_users":
-            #     raise UserIdAlreadyExistsError(user.id.to_raw()) from err
-            case "permissions_uq_perm_code":
-                raise AlreadyExists(str(model.perm_code)) from err
+        match err.orig.__cause__.constraint_name:  # type: ignore
+            case 'permissions_pk':
+                raise PermissionIdAlreadyExists(model.id) from err
+            case 'permissions_uq_perm_code':
+                raise PermissionCodeAlreadyExists(model.perm_code) from err
             case _:
-                super()._parse_error(err, model)
+                logger.error('Unknown error occurred', extra={'error': repr(err)})
+                raise err
