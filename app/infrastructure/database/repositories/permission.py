@@ -1,14 +1,18 @@
 import logging
 
-from sqlalchemy import select
+from sqlalchemy import and_, select
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from app.domain.common.exceptions import ConflictException, NotFoundException
-from app.domain.permission.exceptions import NotFound, PermissionCodeAlreadyExists, PermissionIdAlreadyExists
+from app.domain.common.exceptions import IdNotFoundException
+from app.domain.permission.exceptions import (
+    PermissionCodeAlreadyExists,
+    PermissionIdAlreadyExists,
+    PermissionIdNotFound,
+)
 from app.domain.permission.model import PermissionModel
 from app.infrastructure.database.models.permission import PermissionDB
-from app.infrastructure.database.repositories.base import BaseRepository
+from app.infrastructure.database.repositories import BaseRepository
 
 logger = logging.getLogger('repository.permission')
 
@@ -16,6 +20,15 @@ logger = logging.getLogger('repository.permission')
 class PermissionRepository(BaseRepository[PermissionDB]):
     def __init__(self, session_maker: async_sessionmaker):
         super().__init__(model=PermissionDB, session_maker=session_maker)
+
+    async def retrieve_one(self, item_id: int | None = None, ) -> PermissionDB | None:
+        sql = select(self.database_model).where(and_(self.database_model.id == item_id))
+        async with self.session.begin() as session:
+            item = await session.scalar(sql)
+            if not item:
+                raise PermissionIdNotFound(item_id)
+            else:
+                return item
 
     async def retrieve_many(self, **kwargs):
         self.order_fields = [f'{PermissionDB.__tablename__}.id']
@@ -37,8 +50,8 @@ class PermissionRepository(BaseRepository[PermissionDB]):
     async def delete(self, item_id: int) -> None:
         try:
             await super().delete(item_id)
-        except NotFoundException:
-            raise NotFound(item_id=item_id)
+        except IdNotFoundException:
+            raise PermissionIdNotFound(item_id)
 
     @staticmethod
     def _parse_error(err: DBAPIError, model: PermissionModel) -> None:

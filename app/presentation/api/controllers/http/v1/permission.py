@@ -6,12 +6,11 @@ from fastapi import APIRouter, status
 
 from app.domain.common.usecases import Services
 from app.domain.permission.dto.permission import (
+    PermissionCreateRequest,
     PermissionDataDto,
     PermissionFullDto,
     PermissionsDto,
-    PermissionUpdateDto,
 )
-from .requests.permission import PermissionCreateRequest
 from .responses.base import DeleteResultSuccess
 
 router = APIRouter(prefix='/permissions', tags=['Разрешения'])
@@ -67,7 +66,7 @@ async def create_permission(
     data: PermissionCreateRequest,
     service: FromDishka[Services],
 ) -> PermissionFullDto:
-    return await service.permission.create(PermissionDataDto(**data.model_dump()))
+    return await service.permission.create(data)
 
 
 @router.put(
@@ -83,7 +82,7 @@ async def update_permission(
     item_data: PermissionDataDto,
     service: FromDishka[Services],
 ) -> PermissionFullDto:
-    return await service.permission.update(PermissionUpdateDto(id=item_id, update_data=item_data))
+    return await service.permission.update(item_id, item_data)
 
 
 @router.delete(
@@ -98,7 +97,5 @@ async def delete_permission(
     item_id: int,
     service: FromDishka[Services],
 ) -> DeleteResultSuccess:
-    logger.debug('Permission deleting', extra={'item_id': item_id})
     await service.permission.delete(item_id)
-    logger.debug('Permission deleted', extra={'item_id': item_id})
     return DeleteResultSuccess(detail={'id': item_id})

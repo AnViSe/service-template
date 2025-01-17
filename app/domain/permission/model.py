@@ -18,10 +18,9 @@ class PermissionModel(Aggregate):
         perm_name: str,
         perm_desc: str,
         status: bool,
-        id: int | None = None,
     ) -> 'PermissionModel':
         model = PermissionModel(
-            id=id,
+            id=None,
             perm_code=perm_code,
             perm_name=perm_name,
             perm_desc=perm_desc,

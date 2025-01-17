@@ -3,8 +3,8 @@ from fastapi import APIRouter, FastAPI
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.domain.common.exceptions import CustomException
-from . import handlers
-from .v1 import permission
+from app.presentation.api.controllers.http import handlers
+from app.presentation.api.controllers.http.v1 import permission
 
 
 def setup_handlers(app: FastAPI):

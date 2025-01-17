@@ -3,8 +3,8 @@ from typing import Self
 from pydantic import PostgresDsn
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncEngine, AsyncSession, create_async_engine
 
-from app.infrastructure.database.repositories.permission import PermissionRepository
-from app.utils.singleton import Singleton
+from app.infrastructure.database.repositories import PermissionRepository
+from app.utils import Singleton
 
 
 class PostgresDB(metaclass=Singleton):
