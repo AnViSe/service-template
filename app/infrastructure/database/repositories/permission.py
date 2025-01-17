@@ -23,7 +23,7 @@ class PermissionRepository(BaseRepository[PermissionDB]):
 
     async def retrieve_one(self, item_id: int | None = None, ) -> PermissionDB | None:
         sql = select(self.database_model).where(and_(self.database_model.id == item_id))
-        async with self.session.begin() as session:
+        async with self.session_maker() as session:
             item = await session.scalar(sql)
             if not item:
                 raise PermissionIdNotFound(item_id)
@@ -45,7 +45,7 @@ class PermissionRepository(BaseRepository[PermissionDB]):
             )
         )
 
-        return await self.select_data(sql, **kwargs)
+        return await self.select_many(sql, **kwargs)
 
     async def delete(self, item_id: int) -> None:
         try:

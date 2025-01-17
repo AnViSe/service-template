@@ -2,17 +2,10 @@ from sqlalchemy import Index, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.domain.permission.model import PermissionModel
-from app.infrastructure.database.models import (
-    Base,
-    bool_status,
-    DatabaseModel,
-    datetime_cr,
-    datetime_up,
-    int_pk_always_true,
-)
+from app.infrastructure.database.models import DatabaseModel, int_pk_always_true, OwnerModel
 
 
-class PermissionDB(DatabaseModel):
+class PermissionDB(DatabaseModel, OwnerModel):
     """Табличная модель Разрешение"""
 
     __tablename__ = 'permissions'
@@ -22,10 +15,6 @@ class PermissionDB(DatabaseModel):
     perm_code: Mapped[str] = mapped_column(String(100), nullable=False, comment='Код разрешения')
     perm_name: Mapped[str] = mapped_column(String(150), nullable=False, comment='Имя разрешения')
     perm_desc: Mapped[str | None] = mapped_column(String(200), nullable=True, comment='Описание разрешения')
-
-    # dt_cr: Mapped[datetime_cr]
-    # dt_up: Mapped[datetime_up]
-    # status: Mapped[bool_status]
 
     def get_id(self) -> int | None:
         return self.id

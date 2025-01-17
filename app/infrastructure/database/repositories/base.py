@@ -40,31 +40,46 @@ class BaseRepository(Generic[AbstractDatabaseModel], metaclass=ABCMeta):
         session_maker: async_sessionmaker,
     ):
         self.database_model = model
-        self.session = session_maker
+        self.session_maker = session_maker
         self.select_columns: dict = {}
         self.filter_fields: list[str] = []
         self.order_fields: list[str] = ['id']
 
+    # def transaction(self, method):
+    #     @wraps(method)
+    #     async def wrapped(self, *args, **kwargs):
+    #         async with self.session_maker() as session:
+    #             try:
+    #                 return await method(self, *args, session=session, **kwargs)
+    #             except Exception as e:
+    #                 await session.rollback()
+    #                 raise e
+    #             finally:
+    #                 await session.close()
+    #
+    #     return wrapped
+
     async def create(self, model: AbstractDomainModel) -> AbstractDatabaseModel:
-        async with self.session.begin() as session:
+        async with self.session_maker.begin() as session:
             model = self.database_model.create_from_domain_model(model)
             session.add(model)
             await session.flush()
             return model
 
     async def create_get_id(self, model: AbstractDomainModel) -> int:
-        async with self.session.begin() as session:
-            db_item = self.database_model.create_from_domain_model(model)
+        db_item = self.database_model.create_from_domain_model(model)
+        async with self.session_maker.begin() as session:
             session.add(db_item)
             try:
                 await session.flush()
+                await session.commit()
                 return db_item.get_id()
             except IntegrityError as e:
                 self._parse_error(e, model)
 
     async def update(self, item_id: int, model: AbstractDomainModel) -> None:
         sql = select(self.database_model).where(and_(self.database_model.id == item_id))
-        async with self.session.begin() as session:
+        async with self.session_maker.begin() as session:
             item = await session.scalar(sql)
             if not item:
                 raise IdNotFoundException(item_id)
@@ -76,7 +91,7 @@ class BaseRepository(Generic[AbstractDatabaseModel], metaclass=ABCMeta):
 
     async def __update(self, item_id: int, model: AbstractDomainModel) -> None:
         db_model = self.database_model.create_from_domain_model(model)
-        async with self.session.begin() as session:
+        async with self.session_maker.begin() as session:
             try:
                 await session.merge(db_model)
             except IntegrityError as e:
@@ -84,7 +99,7 @@ class BaseRepository(Generic[AbstractDatabaseModel], metaclass=ABCMeta):
 
     async def retrieve_one(self, item_id: int | None = None, ) -> AbstractDatabaseModel | None:
         sql = select(self.database_model).where(and_(self.database_model.id == item_id))
-        async with self.session.begin() as session:
+        async with self.session_maker() as session:
             item = await session.scalar(sql)
             if not item:
                 raise IdNotFoundException(item_id)
@@ -93,7 +108,7 @@ class BaseRepository(Generic[AbstractDatabaseModel], metaclass=ABCMeta):
 
     async def retrieve_all(self) -> Sequence[AbstractDatabaseModel]:
         sql = select(self.database_model)
-        async with self.session.begin() as session:
+        async with self.session_maker() as session:
             _exec = await session.scalars(sql)
             return _exec.all()
 
@@ -101,7 +116,7 @@ class BaseRepository(Generic[AbstractDatabaseModel], metaclass=ABCMeta):
         sql = delete(self.database_model).where(and_(self.database_model.id == item_id)).returning(
             self.database_model.id
         )
-        async with self.session.begin() as session:
+        async with self.session_maker.begin() as session:
             item = await session.scalar(sql)
             if not item:
                 raise IdNotFoundException(item_id)
@@ -324,12 +339,12 @@ class BaseRepository(Generic[AbstractDatabaseModel], metaclass=ABCMeta):
             case _:
                 return value
 
-    async def select_data(self, sql: SelectType, **kwargs):
+    async def select_many(self, sql: SelectType, **kwargs):
         self.__gen_select_columns(sql)
         _skip, _limit = self.__get_limits(**kwargs)
         _sql = sql.where(self.__gen_filter_columns(**kwargs))
         _sql_count = select(func.count()).select_from(_sql.subquery())
-        async with self.session.begin() as session:
+        async with self.session_maker() as session:
             _record_count = await session.scalar(_sql_count)
             if _record_count > 0:
                 _orders = self.__gen_order_columns(**kwargs)

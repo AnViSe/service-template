@@ -49,6 +49,16 @@ class AppConfig(BaseSettings):
         return f'{self.bus_group}-{self.app_id}'
 
 
+class AuthConfig(BaseSettings):
+    model_config = env_model_config(env_prefix='AUTH_')
+
+    algorithm: str = Field(default='HS256', init=False)
+    secret_key: SecretStr = Field(default='secret', init=False)
+    refresh_key: SecretStr = Field(default='refresh', init=False)
+    access_token_expire_minutes: int = Field(default=600, init=False)
+    refresh_token_expire_minutes: int = Field(default=38400, init=False)
+
+
 class PostgresConfig(BaseSettings):
     model_config = env_model_config(env_prefix='DB_MAIN_')
 
@@ -114,6 +124,7 @@ class CacheConfig(RedisConfig):
 
 class Config(BaseModel):
     app: AppConfig = Field(default_factory=lambda: AppConfig())
+    auth: AuthConfig = Field(default_factory=lambda: AuthConfig())
     postgres: PostgresConfig = Field(default_factory=lambda: PostgresConfig())
     bus: BusConfig = Field(default_factory=lambda: BusConfig())
     cache: CacheConfig = Field(default_factory=lambda: CacheConfig())

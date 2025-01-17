@@ -9,6 +9,7 @@ from app.domain.common.dto.helper import (
     IdWithZeroField,
     StatusField,
 )
+from app.domain.user.dto.helper import LastLoginOptionalField
 
 
 class DTO(BaseModel):
@@ -49,8 +50,8 @@ class IDWithZeroModelMixin(BaseModel):
 #     users: list[int] | None = ItemsOptionalField
 
 
-# class LastLoginMixin(BaseModel):
-#     last_login: datetime | None = LastLoginOptionalField
+class LastLoginMixin(BaseModel):
+    last_login: datetime | None = LastLoginOptionalField
 
 
 # class SubdivisionMixin(BaseModel):

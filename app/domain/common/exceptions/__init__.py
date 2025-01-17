@@ -9,6 +9,7 @@ from .repository import (
     UndefinedTableException,
     ValidationException,
 )
+from .token import TokenExpired, TokenInvalid
 
 __all__ = [
     'ArgumentException',
@@ -19,6 +20,8 @@ __all__ = [
     'IdNotFoundException',
     'RepositoryException',
     'RequestInvalid',
+    'TokenExpired',
+    'TokenInvalid',
     'TypeException',
     'UnauthorizedException',
     'UndefinedColumnException',

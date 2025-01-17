@@ -12,7 +12,7 @@ logger = logging.getLogger('exception_mapper')
 
 Param = ParamSpec("Param")
 ReturnType = TypeVar("ReturnType")
-Func = Callable[Param, ReturnType]
+# Func = Callable[Param, ReturnType]
 
 
 def exception_mapper(
