@@ -1,9 +1,9 @@
-from app.domain.common.exceptions import ConflictException, NotFoundException
+from app.domain.common.exceptions import ConflictException, IdNotFoundException
 
 
-class NotFound(NotFoundException):
+class PermissionIdNotFound(IdNotFoundException):
     def __init__(self, item_id: int):
-        super().__init__(f'Permission with id={item_id} not found')
+        super().__init__(item_id, 'Permission with id=<{}> not found')
 
 
 class PermissionIdAlreadyExists(ConflictException):

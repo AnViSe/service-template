@@ -12,7 +12,7 @@ logger = logging.getLogger('http.exception')
 
 def custom_exc_handler(_: Request, exception: CustomException) -> JSONResponse:
     # logger.error('Handle APP error', exc_info=exception, extra={'error': exception})
-    logger.error('Handle APP error', extra={'error': exception.message})
+    logger.error('Handle APP error', extra={'error': repr(exception)})
     return JSONResponse(
         status_code=exception.http_code,
         content=dict(detail=exception.message),
