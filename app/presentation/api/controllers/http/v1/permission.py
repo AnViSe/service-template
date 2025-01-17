@@ -2,7 +2,7 @@ import logging
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
 
 from app.domain.common.usecases import Services
 from app.domain.permission.dto.permission import (
@@ -12,6 +12,7 @@ from app.domain.permission.dto.permission import (
     PermissionsDto,
 )
 from .responses.base import DeleteResultSuccess
+from ..handlers.helper import QueryParams
 
 router = APIRouter(prefix='/permissions', tags=['Разрешения'])
 
@@ -28,15 +29,9 @@ logger = logging.getLogger('http.v1.permission')
 @inject
 async def get_permissions(
     service: FromDishka[Services],
+    query: QueryParams = Depends(),
 ) -> PermissionsDto:
-    return await service.permission.get_many(
-        gt=0,
-        skip=0,
-        limit=10,
-        sort='id',
-        search=None,
-        filters=None,
-    )
+    return await service.permission.get_many(**query.model_dump())
 
 
 @router.get(
