@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.domain.common.exceptions import IdNotFoundException
 from app.domain.common.exceptions.base import NotFoundException
+from app.domain.user.dto.user import UserDto, UserFullDto
 from app.domain.user.exceptions import (
     UserIdAlreadyExists,
     UserIdNotFound,
@@ -25,22 +26,36 @@ class UserRepository(BaseRepository[UserDB]):
     def __init__(self, session_maker: async_sessionmaker):
         super().__init__(model=UserDB, session_maker=session_maker)
 
-    async def retrieve_by_id(self, item_id: int | None = None) -> UserDB | None:
+    async def get_by_id(self, item_id: int) -> UserDto:
         try:
-            return await self.retrieve_one(item_id)
+            db_model = await self.base_get_one(item_id=item_id)
+            return UserDto.model_validate(db_model)
         except IdNotFoundException as e:
             raise UserIdNotFound(item_id) from e
 
-    async def retrieve_by_username(self, user_name: str) -> UserDB | None:
+    async def get_full_by_id(self, item_id: int) -> UserFullDto:
+        self.sql_select = (
+            select(UserDB)
+            # .options(subqueryload(UserDB.roles))
+            # .options(subqueryload(UserDB.permissions))
+            .where(UserDB.id == item_id)
+        )
+        async with self.session_maker() as session:
+            db_model = await session.scalar(self.sql_select)
+            if not db_model:
+                raise UserIdNotFound(item_id)
+            return UserFullDto.model_validate(db_model)
+
+    async def get_by_username(self, user_name: str) -> UserDB | None:
         try:
-            return await self.retrieve_one(
+            return await self.base_get_one(
                 where_clause=[func.lower(self.database_model.user_name) == user_name.lower()]
             )
         except NotFoundException as e:
             raise UserNameNotFound(user_name) from e
 
-    async def retrieve_by_code(self, code: str) -> UserDB | None:
-        return await self.retrieve_one(
+    async def get_by_code(self, code: str) -> UserDB | None:
+        return await self.base_get_one(
             where_clause=[self.database_model.verification_code == code]
         )
 

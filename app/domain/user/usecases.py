@@ -30,7 +30,7 @@ class UserService:
 
     @exception_mapper
     async def get_one(self, item_id: int) -> UserFullDto:
-        model = await self.service.adapters.postgres.user.retrieve_one(item_id)
+        model = await self.service.adapters.postgres.user.get_by_id(item_id)
         return UserFullDto.model_validate(model)
 
     @exception_mapper

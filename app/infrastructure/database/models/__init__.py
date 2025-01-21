@@ -22,7 +22,6 @@ class DtCrUpModel:
 
 
 class DatabaseModel(Base):
-
     __abstract__ = True
 
     status: Mapped[bool_status]
