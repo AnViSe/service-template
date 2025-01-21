@@ -15,11 +15,16 @@ class UserCreateRequest(BaseModel):
     # permissions: list[int] | None
     status: bool = StatusField
 
-# class UserSignUpRequest(BaseModel):
-#     user_name: str = helper.UserNameField
-#     user_mail: EmailStr | None = helper.UserMailOptionalField
-#     user_pass: str = helper.UserPassField
-#     sd_id: int | None = helper.SubdivisionIdOptionalField
+
+class UserSignInRequest(BaseModel):
+    username: str = helper.UserNameField
+    password: str = helper.UserPassField
+
+class UserSignUpRequest(BaseModel):
+    user_name: str = helper.UserNameField
+    user_mail: EmailStr | None = helper.UserMailOptionalField
+    user_pass: str = helper.UserPassField
+    sd_id: int | None = helper.SubdivisionIdOptionalField
 
 
 # class PasswordUpdateRequest(BaseModel):

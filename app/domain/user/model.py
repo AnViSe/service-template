@@ -10,11 +10,12 @@ class UserModel(Aggregate):
     """Доменная модель Пользователь"""
 
     user_name: str
-    sd_id: int | None
     user_mail: EmailStr | None
     user_pass: str
     user_desc: str | None
     user_avatar: str | None
+
+    sd_id: int | None
 
     # roles: list[int] | None
     # permissions: list[int] | None
@@ -23,23 +24,23 @@ class UserModel(Aggregate):
     def create(
         cls,
         user_name: str,
-        sd_id: int | None,
         user_mail: EmailStr | None,
-        user_desc: str | None,
-        user_avatar: str | None,
+        sd_id: int | None,
         # roles: list[int] | None,
         # permissions: list[int] | None,
-        status: bool,
+        user_desc: str | None = None,
+        user_avatar: str | None = None,
         user_pass: str | None = None,
+        status: bool = False,
     ) -> 'UserModel':
         user = UserModel(
             id=None,
             user_name=user_name,
-            sd_id=sd_id,
             user_mail=user_mail,
             user_pass=user_pass,
             user_desc=user_desc,
             user_avatar=user_avatar,
+            sd_id=sd_id,
             # roles=roles,
             # permissions=permissions,
             dt_cr=None,

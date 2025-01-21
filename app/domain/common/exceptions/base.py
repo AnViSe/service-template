@@ -16,6 +16,11 @@ class UnauthorizedException(CustomException):
         super().__init__(message, internal_code=0, http_code=401)
 
 
+class NotFoundException(CustomException):
+    def __init__(self, message: str = 'Not Found'):
+        super().__init__(message, internal_code=0, http_code=404)
+
+
 class IdNotFoundException(CustomException):
     """Use message formatting
 

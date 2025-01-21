@@ -9,7 +9,7 @@ from sqlalchemy import (
     and_,
     Boolean,
     cast,
-    CTE,
+    ColumnElement, CTE,
     DateTime,
     delete,
     desc,
@@ -25,6 +25,7 @@ from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.domain.common.exceptions import IdNotFoundException
+from app.domain.common.exceptions.base import NotFoundException
 from app.domain.common.models.base import AbstractDomainModel
 from app.infrastructure.database.models import AbstractDatabaseModel
 
@@ -89,22 +90,26 @@ class BaseRepository(Generic[AbstractDatabaseModel], metaclass=ABCMeta):
             except IntegrityError as e:
                 self._parse_error(e, model)
 
-    async def __update(self, item_id: int, model: AbstractDomainModel) -> None:
-        db_model = self.database_model.create_from_domain_model(model)
-        async with self.session_maker.begin() as session:
-            try:
-                await session.merge(db_model)
-            except IntegrityError as e:
-                self._parse_error(e, model)
-
-    async def retrieve_one(self, item_id: int | None = None, ) -> AbstractDatabaseModel | None:
-        sql = select(self.database_model).where(and_(self.database_model.id == item_id))
+    async def retrieve_one(
+        self,
+        item_id: int | None = None,
+        where_clause: list[ColumnElement[bool] | bool] | None = None,
+    ) -> AbstractDatabaseModel | None:
         async with self.session_maker() as session:
-            item = await session.scalar(sql)
-            if not item:
-                raise IdNotFoundException(item_id)
-            else:
-                return item
+            if item_id is not None:
+                sql = select(self.database_model).where(and_(self.database_model.id == item_id))
+                item = await session.scalar(sql)
+                if not item:
+                    raise IdNotFoundException(item_id)
+                else:
+                    return item
+            if where_clause is not None:
+                sql = select(self.database_model).where(and_(*where_clause))
+                item = await session.scalar(sql)
+                if not item:
+                    raise NotFoundException
+                else:
+                    return item
 
     async def retrieve_all(self) -> Sequence[AbstractDatabaseModel]:
         sql = select(self.database_model)

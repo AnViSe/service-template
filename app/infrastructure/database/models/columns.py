@@ -16,7 +16,7 @@ int_sort = Annotated[
 datetime_ac = Annotated[datetime, mapped_column(nullable=True, comment='Активирована')]
 datetime_cr = Annotated[datetime, mapped_column(server_default=func.now(), comment='Создана')]
 datetime_up = Annotated[datetime | None, mapped_column(nullable=True, onupdate=get_current_datetime, comment='Изменена')]
-datetime_up_no_update = Annotated[datetime | None, mapped_column(comment='Изменена')]
+datetime_up_no_update = Annotated[datetime | None, mapped_column(nullable=True, comment='Изменена')]
 
 owner_cr = Annotated[int | None, mapped_column(nullable=True, comment='Код создателя')]
 owner_up = Annotated[int | None, mapped_column(nullable=True, comment='Код редактора')]

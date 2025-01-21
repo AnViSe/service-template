@@ -2,10 +2,10 @@ from sqlalchemy import Index, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.domain.permission.model import PermissionModel
-from app.infrastructure.database.models import DatabaseModel, int_pk_always_true, OwnerModel
+from app.infrastructure.database.models import DatabaseModel, DtCrUpModel, int_pk_always_true, OwnerModel
 
 
-class PermissionDB(DatabaseModel, OwnerModel):
+class PermissionDB(OwnerModel, DtCrUpModel, DatabaseModel):
     """Табличная модель Разрешение"""
 
     __tablename__ = 'permissions'

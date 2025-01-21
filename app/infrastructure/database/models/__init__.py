@@ -14,12 +14,17 @@ class OwnerModel:
     owner_up: Mapped[owner_up]
 
 
-class DatabaseModel(Base):
-
+class DtCrUpModel:
     __abstract__ = True
 
     dt_cr: Mapped[datetime_cr]
     dt_up: Mapped[datetime_up]
+
+
+class DatabaseModel(Base):
+
+    __abstract__ = True
+
     status: Mapped[bool_status]
 
     def get_id(self) -> int | None:
@@ -44,6 +49,7 @@ __all__ = [
     'AbstractDatabaseModel',
     'Base',
     'DatabaseModel',
+    'DtCrUpModel',
     'OwnerModel',
     'bool_status',
     'datetime_cr',

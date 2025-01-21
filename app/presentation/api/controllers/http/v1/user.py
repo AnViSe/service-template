@@ -11,8 +11,8 @@ from app.domain.user.dto.user import (
     UserFullDto,
     UsersDto,
 )
+from .helper import QueryParams
 from .responses.base import DeleteResultSuccess
-from ..handlers.helper import QueryParams
 
 router = APIRouter(prefix='/users', tags=['Пользователи'])
 

@@ -16,7 +16,7 @@ class LoggingConfig(BaseSettings):
     model_config = env_model_config(env_prefix='LOG_')
 
     level: str = Field(default='DEBUG', init=False)
-    logger_name: str = Field(default='srv-template', init=False)
+    logger_name: str = Field(default='srv.template', init=False)
 
     file_path: Path = Field(default='logs', init=False)
     file_name: str = Field(default='service.log', init=False)
@@ -35,7 +35,7 @@ class AppConfig(BaseSettings):
     version: str = Field(default='0.0.1', init=False)
     title: str = Field(default='Application Title', init=False)
     description: str | None = Field(default=None, init=False)
-    api_url: str = Field(default='/api/v1/srv', init=False)
+    api_url: str = Field(default='/api/v1/template', init=False)
     bus_group: str = Field(default='srv-template', init=False)
 
     app_id: int | None = Field(default=None, init=False)

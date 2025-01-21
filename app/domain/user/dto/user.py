@@ -61,6 +61,7 @@ class UserAuthDto(DTO):
     user_name: str = UserNameField
     user_pass: str = UserPassField
     user_mail: EmailStr | None = UserMailOptionalField
+    sd_id: int | None = SubdivisionIdOptionalField
     status: bool = StatusField
 
 
@@ -81,11 +82,10 @@ class _UserResetPasswordDto(DTO):
     status: bool = StatusField
 
 
-class UserSignupDto(DTO):
+class UserSignUpDto(DTO):
     user_name: str = UserNameField
     user_mail: EmailStr | None = UserMailOptionalField
     user_pass: str = UserPassField
     sd_id: int | None = SubdivisionIdOptionalField
-
 
 UsersDto: TypeAlias = PaginatedItemsDTO[UserDto]

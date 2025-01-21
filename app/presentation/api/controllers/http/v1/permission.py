@@ -11,8 +11,8 @@ from app.domain.permission.dto.permission import (
     PermissionFullDto,
     PermissionsDto,
 )
+from .helper import QueryParams
 from .responses.base import DeleteResultSuccess
-from ..handlers.helper import QueryParams
 
 router = APIRouter(prefix='/permissions', tags=['Разрешения'])
 

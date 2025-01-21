@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.domain.user.model import UserModel
 from app.infrastructure.database.models import DatabaseModel, int_pk_always_true, OwnerModel
-from app.infrastructure.database.models.columns import datetime_ac
+from app.infrastructure.database.models.columns import datetime_ac, datetime_cr, datetime_up_no_update
 
 
 class UserDB(DatabaseModel, OwnerModel):
@@ -40,6 +40,8 @@ class UserDB(DatabaseModel, OwnerModel):
     # )
 
     dt_ac: Mapped[datetime_ac]
+    dt_cr: Mapped[datetime_cr]
+    dt_up: Mapped[datetime_up_no_update]
 
     def get_id(self) -> int | None:
         return self.id
