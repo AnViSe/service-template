@@ -20,9 +20,11 @@ logger = logging.getLogger('service.user')
 
 
 class UserService:
+    # sub = None
 
     def __init__(self, service: 'Services'):
         self.service = service
+        # self.sub = service.adapters.bus.subscriber('')
 
     @exception_mapper
     async def get_one(self, item_id: int) -> UserFullDto:
