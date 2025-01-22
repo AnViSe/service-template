@@ -2,18 +2,11 @@ from typing import TypeAlias
 
 from pydantic import BaseModel
 
-from app.domain.common.dto.base import (
-    DtCrUpModelMixin,
-    DTO,
-    IDModelMixin,
-    StatusModelMixin,
-)
-from app.domain.common.dto.helper import StatusField
-from app.domain.common.dto.pagination import PaginatedItemsDTO
-from app.domain.permission.dto.helper import PermCodeField, PermDescOptionalField, PermNameField
+from app.domain.common import dto as common_dto
+from .fields import PermCodeField, PermDescOptionalField, PermNameField
 
 
-class BasePermission(DTO):
+class BasePermission(common_dto.DTO):
     perm_code: str = PermCodeField
     perm_name: str = PermNameField
     perm_desc: str | None = PermDescOptionalField
@@ -25,23 +18,39 @@ class PermissionCreateRequest(BaseModel):
     perm_desc: str | None = PermDescOptionalField
     # users: list[int] | None
     # roles: list[int] | None
-    status: bool = StatusField
+    status: bool = common_dto.StatusField
 
 
-class PermissionDataDto(StatusModelMixin, BasePermission):
+class PermissionDataDto(
+    common_dto.StatusModelMixin,
+    BasePermission,
+):
     ...
 
 
-class PermissionUpdateDto(DTO, IDModelMixin):
+class PermissionUpdateDto(
+    common_dto.DTO,
+    common_dto.IDModelMixin,
+):
     update_data: PermissionDataDto
 
 
-class PermissionDto(StatusModelMixin, DtCrUpModelMixin, BasePermission, IDModelMixin):
+class PermissionDto(
+    common_dto.StatusModelMixin,
+    common_dto.DtCrUpModelMixin,
+    BasePermission,
+    common_dto.IDModelMixin,
+):
     ...
 
 
-class PermissionFullDto(StatusModelMixin, DtCrUpModelMixin, BasePermission, IDModelMixin):
+class PermissionFullDto(
+    common_dto.StatusModelMixin,
+    common_dto.DtCrUpModelMixin,
+    BasePermission,
+    common_dto.IDModelMixin,
+):
     ...
 
 
-PermissionsDto: TypeAlias = PaginatedItemsDTO[PermissionDto]
+PermissionsDto: TypeAlias = common_dto.PaginatedItemsDTO[PermissionDto]

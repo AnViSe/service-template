@@ -52,6 +52,7 @@ class AppConfig(BaseSettings):
 class AuthConfig(BaseSettings):
     model_config = env_model_config(env_prefix='AUTH_')
 
+    api_url: str = Field(default='/api/v1/template', init=False)
     algorithm: str = Field(default='HS256', init=False)
     secret_key: SecretStr = Field(default='secret', init=False)
     refresh_key: SecretStr = Field(default='refresh', init=False)
@@ -129,3 +130,6 @@ class Config(BaseModel):
     bus: BusConfig = Field(default_factory=lambda: BusConfig())
     cache: CacheConfig = Field(default_factory=lambda: CacheConfig())
     logging: LoggingConfig = Field(default_factory=lambda: LoggingConfig())
+
+
+config = Config()

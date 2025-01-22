@@ -5,12 +5,7 @@ from dishka.integrations.fastapi import inject
 from fastapi import APIRouter, Depends, status
 
 from app.domain.common.usecases import Services
-from app.domain.user.dto.request import UserCreateRequest
-from app.domain.user.dto.user import (
-    UserDataDto,
-    UserFullDto,
-    UsersDto,
-)
+from app.domain.user import dto as user_dto
 from .helper import QueryParams
 from .responses.base import DeleteResultSuccess
 
@@ -21,7 +16,7 @@ logger = logging.getLogger('http.v1.user')
 
 @router.get(
     '',
-    response_model=UsersDto,
+    response_model=user_dto.UsersDto,
     status_code=status.HTTP_200_OK,
     summary='Список пользователей',
     description='Получение списка пользователей',
@@ -30,13 +25,13 @@ logger = logging.getLogger('http.v1.user')
 async def get_users(
     service: FromDishka[Services],
     query: QueryParams = Depends(),
-) -> UsersDto:
+) -> user_dto.UsersDto:
     return await service.user.get_many(**query.model_dump())
 
 
 @router.get(
     '/{item_id}',
-    response_model=UserFullDto,
+    response_model=user_dto.UserFullDto,
     status_code=status.HTTP_200_OK,
     summary='Получение информации о пользователе',
     description='Получение информации о пользователе',
@@ -45,28 +40,28 @@ async def get_users(
 async def get_user(
     item_id: int,
     service: FromDishka[Services],
-) -> UserFullDto:
+) -> user_dto.UserFullDto:
     return await service.user.get_one(item_id)
 
 
 @router.post(
     '',
-    response_model=UserFullDto,
+    response_model=user_dto.UserFullDto,
     status_code=status.HTTP_201_CREATED,
     summary='Создание нового пользователя',
     description='Создание нового пользователя',
 )
 @inject
 async def create_user(
-    data: UserCreateRequest,
+    data: user_dto.UserCreateRequest,
     service: FromDishka[Services],
-) -> UserFullDto:
+) -> user_dto.UserFullDto:
     return await service.user.create(data)
 
 
 @router.put(
     '/{item_id}',
-    response_model=UserFullDto,
+    response_model=user_dto.UserFullDto,
     status_code=status.HTTP_200_OK,
     summary='Изменение пользователя',
     description='Изменение пользователя',
@@ -74,9 +69,9 @@ async def create_user(
 @inject
 async def update_user(
     item_id: int,
-    item_data: UserDataDto,
+    item_data: user_dto.UserDataDto,
     service: FromDishka[Services],
-) -> UserFullDto:
+) -> user_dto.UserFullDto:
     return await service.user.update(item_id, item_data)
 
 

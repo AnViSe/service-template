@@ -1,31 +1,38 @@
 from pydantic import BaseModel, EmailStr
 
-from app.domain.common.dto.helper import StatusField
-from app.domain.user.dto import helper
+from app.domain.common import dto as common_dto
+from .fields import (
+    SubdivisionIdOptionalField,
+    UserAvatarOptionalField,
+    UserDescOptionalField,
+    UserMailOptionalField,
+    UserNameField,
+    UserPassField,
+)
 
 
 class UserCreateRequest(BaseModel):
-    user_name: str = helper.UserNameField
-    user_mail: EmailStr | None = helper.UserMailOptionalField
-    user_pass: str = helper.UserPassField
-    sd_id: int | None = helper.SubdivisionIdOptionalField
-    user_avatar: str | None = helper.UserAvatarOptionalField
-    user_desc: str | None = helper.UserDescOptionalField
+    user_name: str = UserNameField
+    user_mail: EmailStr | None = UserMailOptionalField
+    user_pass: str = UserPassField
+    sd_id: int | None = SubdivisionIdOptionalField
+    user_avatar: str | None = UserAvatarOptionalField
+    user_desc: str | None = UserDescOptionalField
     # roles: list[int] | None
     # permissions: list[int] | None
-    status: bool = StatusField
+    status: bool = common_dto.StatusField
 
 
 class UserSignInRequest(BaseModel):
-    username: str = helper.UserNameField
-    password: str = helper.UserPassField
+    username: str = UserNameField
+    password: str = UserPassField
+
 
 class UserSignUpRequest(BaseModel):
-    user_name: str = helper.UserNameField
-    user_mail: EmailStr | None = helper.UserMailOptionalField
-    user_pass: str = helper.UserPassField
-    sd_id: int | None = helper.SubdivisionIdOptionalField
-
+    user_name: str = UserNameField
+    user_mail: EmailStr | None = UserMailOptionalField
+    user_pass: str = UserPassField
+    sd_id: int | None = SubdivisionIdOptionalField
 
 # class PasswordUpdateRequest(BaseModel):
 #     user_pass: str = helper.UserPassNewField

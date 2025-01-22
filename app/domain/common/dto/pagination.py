@@ -1,7 +1,7 @@
 from typing import Generic, TypeVar
 
 from .base import DTO
-from .helper import RecordsField, ResultsField, SkipField
+from .fields import RecordsField, ResultsField, SkipField
 
 Item = TypeVar('Item')
 

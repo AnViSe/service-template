@@ -1,13 +1,12 @@
-from app.domain.common.dto.base import DTO, IDModelMixin
-from app.domain.common.dto.helper import StatusField
-from app.domain.user.dto.helper import UserDescOptionalField, UserNameField
+from app.domain.common import dto as common_dto
+from app.domain.user import dto as user_dto
 
 
-class ShortUser(DTO):
-    user_name: str = UserNameField
-    user_desc: str | None = UserDescOptionalField
-    status: bool = StatusField
+class ShortUser(common_dto.DTO):
+    user_name: str = user_dto.UserNameField
+    user_desc: str | None = user_dto.UserDescOptionalField
+    status: bool = common_dto.StatusField
 
 
-class UserShortDto(ShortUser, IDModelMixin):
+class UserShortDto(ShortUser, common_dto.IDModelMixin):
     ...

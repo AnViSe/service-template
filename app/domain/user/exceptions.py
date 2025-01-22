@@ -1,4 +1,4 @@
-from app.domain.common.exceptions import ConflictException, IdNotFoundException, UnauthorizedException
+from app.domain.common.exceptions import ConflictException, IdNotFoundException
 from app.domain.common.exceptions.base import NotFoundException
 
 
@@ -22,16 +22,11 @@ class UserNameAlreadyExists(ConflictException):
         super().__init__(f'User with name=<{user_name}> already exists')
 
 
+class UserMailNotFound(NotFoundException):
+    def __init__(self, user_email: str):
+        super().__init__(f'User with email=<{user_email}> not found')
+
+
 class UserMailAlreadyExists(ConflictException):
     def __init__(self, user_mail: str):
         super().__init__(f'User with e-mail=<{user_mail}> already exists')
-
-
-class UserNotActive(UnauthorizedException):
-    def __init__(self, user_name: str):
-        super().__init__(f'User with name=<{user_name}> is not active')
-
-
-class PasswordWrong(UnauthorizedException):
-    def __init__(self):
-        super().__init__('Password is wrong')

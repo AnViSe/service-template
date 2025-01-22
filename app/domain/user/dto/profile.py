@@ -2,17 +2,18 @@ from datetime import datetime
 
 from pydantic import BaseModel, EmailStr
 
-from app.domain.common.dto.base import DTO, IDModelMixin
-from app.domain.user.dto.helper import (
+from app.domain.common import dto as common_dto
+from .fields import (
     SubdivisionIdOptionalField,
-    SubdivisionNameOptionalField, UserAvatarOptionalField,
+    SubdivisionNameOptionalField,
+    UserAvatarOptionalField,
     UserDescOptionalField,
     UserMailOptionalField,
     UserNameField,
 )
 
 
-class UserProfileDto(DTO, IDModelMixin):
+class UserProfileDto(common_dto.DTO, common_dto.IDModelMixin):
     user_name: str = UserNameField
     user_mail: EmailStr | None = UserMailOptionalField
     user_desc: str | None = UserDescOptionalField
@@ -26,5 +27,5 @@ class UserProfileDataDto(BaseModel):
     user_avatar: str | None = UserAvatarOptionalField
 
 
-class UserProfileUpdateDto(DTO, IDModelMixin):
+class UserProfileUpdateDto(common_dto.DTO, common_dto.IDModelMixin):
     update_data: UserProfileDataDto

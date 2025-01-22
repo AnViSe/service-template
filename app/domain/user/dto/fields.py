@@ -17,6 +17,4 @@ UserDescOptionalField = Field(None, max_length=150, examples=['Good user'], titl
 
 UserAvatarOptionalField = Field(None, max_length=100, examples=['avatar.png'], title='Аватар пользователя')
 
-VerificationCodeOptionalField = Field(None, max_length=100, examples=['SuperVerifyString'], title='Код верификации')
-
 LastLoginOptionalField = Field(None, title='Последний вход')

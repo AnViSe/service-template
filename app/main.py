@@ -1,12 +1,11 @@
 from dishka import AsyncContainer, make_async_container
 from dishka.integrations import fastapi as fastapi_integration
 
-from app.core.config import Config
+from app.core.config import Config, config
 from app.core.ioc import AppProvider
 from app.core.log.main import StructLogger
 from app.fastapi import FastAPIApp
 
-config = Config()
 logger = StructLogger(config)
 
 

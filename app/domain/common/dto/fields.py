@@ -9,7 +9,7 @@ SortField = Field(999, ge=0, le=999, examples=[999], title='Сортировка
 SortOptionalField = Field(None, ge=0, le=999, examples=[999], title='Сортировка')
 
 DtCrField = Field(..., title='Создана')
-DtUpField = Field(None, title='Изменена')
+DtUpOptionalField = Field(None, title='Изменена')
 
 StatusField = Field(True, examples=['true'], title='Статус')
 StatusOptionalField = Field(None, examples=['true'], title='Статус')
