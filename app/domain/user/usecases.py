@@ -44,8 +44,10 @@ class UserService:
         new_model = UserModel.create(**item.model_dump())
         new_model.user_pass = self.service.security.pwd.hash_pwd(new_model.user_pass)
         item_created_id = await self.service.adapters.postgres.user.create_get_id(new_model)
-        item_created = await self.service.adapters.postgres.user.retrieve_one(item_created_id)
-        return UserFullDto.model_validate(item_created)
+        item_created = await self.service.adapters.postgres.user.get_full_by_id(item_created_id)
+        user = UserFullDto.model_validate(item_created)
+        await self.service.adapters.bus.publish(user, 'user_created')
+        return user
 
     @exception_mapper
     async def update(self, item_id: int, item_data: UserDataDto) -> UserFullDto:

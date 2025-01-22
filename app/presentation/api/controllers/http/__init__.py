@@ -17,5 +17,5 @@ def setup_handlers(app: FastAPI):
 
 router = APIRouter()
 router.include_router(auth.router)
-# router.include_router(user.router)
+router.include_router(user.router)
 # router.include_router(permission.router)
