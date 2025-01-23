@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class Status(BaseModel):
-    name: str
+    name: str = 'Service name: version'
     status: bool | str | float | None
 
 

@@ -1,11 +1,12 @@
-from collections.abc import Callable
+import collections
 from typing import Any
 from uuid import UUID
 
 import orjson
 import structlog
+from structlog.typing import EventDict, WrappedLogger
 
-ProcessorType = Callable[
+ProcessorType = collections.abc.Callable[
     [
         structlog.types.WrappedLogger,
         str,
@@ -24,12 +25,16 @@ def additionally_serialize(obj: object) -> Any:
 
 
 def serialize_to_json(data: Any, default: Any) -> str:
-    return orjson.dumps(data, default=additionally_serialize).decode()
+    # print(data)
+    # result = orjson.dumps(data, default=additionally_serialize).decode()
+    result = orjson.dumps(data).decode()
+    # print(result)
+    return result
 
 
 def get_render_processor(
     render_json_logs: bool = False,
-    serializer: Callable[..., str | bytes] = serialize_to_json,
+    serializer: collections.abc.Callable[..., str | bytes] = serialize_to_json,
     colors: bool = True,
 ) -> ProcessorType:
     if render_json_logs:
@@ -50,3 +55,11 @@ def drop_color_message_key(_, __, event_dict: structlog.types.EventDict) -> stru
     """
     event_dict.pop('color_message', None)
     return event_dict
+
+
+class ForcedKeyOrderRenderer(structlog.processors.KeyValueRenderer):
+    """Based upon KeyValueRenderer but returns dict instead of string."""
+
+    def __call__(self, _: WrappedLogger, __: str, event_dict: EventDict):
+        sorted_dict = self._ordered_items(event_dict)
+        return collections.OrderedDict(**{key: value for key, value in sorted_dict})

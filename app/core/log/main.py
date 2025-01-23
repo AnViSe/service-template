@@ -7,7 +7,7 @@ from pathlib import Path
 import structlog
 from sqlalchemy import log as sa_log
 
-from .processors import get_render_processor, sqlalchemy_processor
+from .processors import ForcedKeyOrderRenderer, get_render_processor, sqlalchemy_processor
 from ..config import Config, LoggingConfig
 
 
@@ -18,10 +18,10 @@ def config_logger(cfg: LoggingConfig, dev_mode: bool = False) -> None:
     common_processors: list[structlog.types.Processor] = [
         structlog.stdlib.add_log_level,
         structlog.stdlib.add_logger_name,
+        structlog.contextvars.merge_contextvars,
         structlog.stdlib.ExtraAdder(),
         structlog.dev.set_exc_info,
         structlog.processors.TimeStamper(fmt='%Y-%m-%d %H:%M:%S.%f', utc=False),
-        structlog.contextvars.merge_contextvars,
         structlog.processors.dict_tracebacks,  # Трассировка стека при ошибке
         # structlog.processors.CallsiteParameterAdder(
         #     (
@@ -41,6 +41,10 @@ def config_logger(cfg: LoggingConfig, dev_mode: bool = False) -> None:
     logging_processors = [
         structlog.stdlib.ProcessorFormatter.remove_processors_meta,
         sqlalchemy_processor,
+        ForcedKeyOrderRenderer(
+            sort_keys=True,
+            key_order=['logger', 'level', 'event', 'client_ip', 'request_id'],
+        ),
     ]
 
     handlers: list[logging.Handler] = []

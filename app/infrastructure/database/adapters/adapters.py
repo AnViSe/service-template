@@ -1,9 +1,12 @@
+import logging
 from contextlib import asynccontextmanager, AsyncExitStack
 from typing import AsyncIterator
 
 from app.core.config import Config
 from app.infrastructure.database.adapters.postgres import PostgresDB
 from app.infrastructure.database.adapters.redis import RedisBus
+
+logger = logging.getLogger('adapters')
 
 
 class Adapters:

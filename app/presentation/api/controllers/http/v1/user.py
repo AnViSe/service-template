@@ -10,8 +10,18 @@ from .helper import QueryParams
 from .responses.base import DeleteResultSuccess
 
 router = APIRouter(prefix='/users', tags=['Пользователи'])
+# router = RedisRouter(prefix='/users', tags=['Пользователи'], url=config.bus.dsn.unicode_string())
 
 logger = logging.getLogger('http.v1.user')
+
+
+# @router.subscriber(stream=StreamSub('user_created', group=config.app.bus_group, consumer=config.app.consumer_name()))
+# @inject
+# async def handle(
+#     msg: UserFullDto,
+#     service: FromDishka[Services],
+# ):
+#     logger.debug(msg)
 
 
 @router.get(

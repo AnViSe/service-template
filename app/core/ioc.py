@@ -14,3 +14,9 @@ class AppProvider(Provider):
             return adapters
 
     services = provide(Services, scope=Scope.REQUEST)
+
+
+providers = [
+    AppProvider(),
+    # EventsBusProvider(),
+]

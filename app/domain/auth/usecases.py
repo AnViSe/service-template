@@ -43,6 +43,7 @@ class AuthService:
         new_model.user_pass = self.service.security.pwd.hash_pwd(item.user_pass)
         item_created_id = await self.service.adapters.postgres.user.create_get_id(new_model)
         item_created = await self.service.adapters.postgres.auth.get_signup_by_id(item_created_id)
+        await self.service.adapters.bus.publish(item_created, 'user_signed')
         return item_created
 
     @exception_mapper

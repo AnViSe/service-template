@@ -1,6 +1,6 @@
 from faststream.redis import RedisRouter
 
-from .v1 import user
+from app.domain.user.handlers import user_router
 
-router = RedisRouter()
-router.include_router(user.router)
+router_bus = RedisRouter()
+router_bus.include_router(user_router)

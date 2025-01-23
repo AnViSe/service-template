@@ -18,30 +18,32 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.debug('Startup Application')
-    # await self._events_bus.start()
+    # broker = new_broker_redis(config.bus.dsn.unicode_string())
+    # broker.include_router(user_router)
+    # await broker.start()
     yield
-    # await self._events_bus.stop()
+    # await broker.close()
     logger.debug('Shutdown Application')
 
 
 class FastAPIApp:
     def __init__(
         self,
-        config: Config,
+        cfg: Config,
     ):
         self.app = FastAPI(
-            title=config.app.title,
-            description=config.app.description,
-            version=config.app.version,
-            debug=config.app.debug,
-            openapi_url=config.app.openapi_url,
+            title=cfg.app.title,
+            description=cfg.app.description,
+            version=cfg.app.version,
+            debug=cfg.app.debug,
+            openapi_url=cfg.app.openapi_url,
             docs_url=None,
             redoc_url=None,
             lifespan=lifespan,
         )
-        if config.app.app_id is None:
-            config.app.app_id = id(self.app)
-        self.config = config
+        if cfg.app.app_id is None:
+            cfg.app.app_id = id(self.app)
+        self.config = cfg
 
     def set_static(self):
         """Настройка использования статических ресурсов"""
@@ -78,5 +80,5 @@ class FastAPIApp:
         self.set_static()
         api.setup_handlers(self.app)
         api.setup_middlewares(self.app)
-        self.app.include_router(api.router, prefix=self.config.app.api_url)
+        self.app.include_router(api.router_http, prefix=self.config.app.api_url)
         return self

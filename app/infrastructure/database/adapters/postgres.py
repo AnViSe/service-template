@@ -1,10 +1,14 @@
+import logging
 from typing import Self
 
 from pydantic import PostgresDsn
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncEngine, AsyncSession, create_async_engine
 
 from app.infrastructure.database import repositories
 from app.utils import Singleton
+
+logger = logging.getLogger('adapter.postgres')
 
 
 class PostgresDB(metaclass=Singleton):
@@ -19,6 +23,13 @@ class PostgresDB(metaclass=Singleton):
         self.__echo = echo
         self.__engine = engine
         self.__session_maker = session_maker
+
+    async def check_connection(self) -> bool:
+        async with self.__session_maker() as session:
+            _exec = await session.execute(text('SELECT VERSION()'))
+            pg_version = _exec.fetchone()
+            logger.debug(f'Postgres version: {pg_version}')
+            return True
 
     async def __set_async_engine(self) -> None:
         if self.__engine is None:

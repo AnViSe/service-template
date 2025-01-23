@@ -44,7 +44,6 @@ class AppConfig(BaseSettings):
     def openapi_url(self) -> str:
         return f'{self.api_url}/openapi.json'
 
-    @property
     def consumer_name(self) -> str:
         return f'{self.bus_group}-{self.app_id}'
 
@@ -107,7 +106,7 @@ class RedisConfig(BaseSettings):
             password=self.password.get_secret_value() if self.password else None,
             host=self.host,
             port=self.port,
-            path=f"/{self.name}"
+            path=f'{self.name}'
         )
 
 
