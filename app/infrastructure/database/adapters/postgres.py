@@ -52,7 +52,6 @@ class PostgresDB(metaclass=Singleton):
     async def __set_repositories(self) -> None:
         if self.__session_maker is not None:
             self.auth = repositories.AuthRepository(self.__session_maker)
-
             self.user = repositories.UserRepository(self.__session_maker)
             self.permission = repositories.PermissionRepository(self.__session_maker)
 

@@ -24,10 +24,8 @@ router = APIRouter(
     description='Get health status',
     summary='Работоспособность сервиса',
 )
-@inject
 async def get_health_status(
     config: FromDishka[Config],
-    service: FromDishka[Services],
 ):
     return Status(name=f'{config.app.title}: {config.app.version}', status=True)
 
@@ -46,7 +44,7 @@ async def get_health_status(
 ):
     result_status = HealthStatus(statuses=list(), errors=list())
     if config.postgres.host:
-        db_ping = ping(config.postgres.host)
+        db_ping = ping(config.postgres.host, timeout=1)
         result_status.statuses.append(Status(name='Ping to database server', status=db_ping))
         try:
             main_base_connected = await service.adapters.postgres.check_connection()
@@ -54,11 +52,16 @@ async def get_health_status(
         except Exception as e:
             result_status.statuses.append(Status(name='Database server not available', status=repr(e)))
 
-
     if config.bus.host:
-        db_ping = ping(config.bus.host)
+        db_ping = ping(config.bus.host, timeout=1)
         result_status.statuses.append(Status(name='Ping to redis-bus server', status=db_ping))
+        try:
+            bus_base_connected = await service.adapters.bus.check_connection()
+            result_status.statuses.append(Status(name='Redis-bus server connected', status=bus_base_connected))
+        except Exception as e:
+            result_status.statuses.append(Status(name='Redis-bus not available', status=repr(e)))
+
     if config.cache.host:
-        db_ping = ping(config.cache.host)
+        db_ping = ping(config.cache.host, timeout=1)
         result_status.statuses.append(Status(name='Ping to redis-cache server', status=db_ping))
     return result_status

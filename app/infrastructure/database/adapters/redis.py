@@ -3,6 +3,7 @@ from typing import Any, Self
 
 from faststream.redis import RedisBroker
 from pydantic import RedisDsn
+from redis import Redis, ConnectionPool
 
 from app.utils import Singleton
 
@@ -18,6 +19,13 @@ class RedisBus(metaclass=Singleton):
         self.__redis_dsn = redis_dsn
         self.__faststream_broker = faststream_broker
         self._connection = None
+
+    async def check_connection(self) -> bool:
+        if self.__faststream_broker:
+            return await self.__faststream_broker.ping(timeout=1)
+        else:
+            return False
+
 
     async def publish(
         self,
