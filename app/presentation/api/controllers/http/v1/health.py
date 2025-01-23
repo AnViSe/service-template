@@ -6,7 +6,7 @@ from fastapi import APIRouter, status
 from ping3 import ping
 
 from app.core.config import Config
-from app.domain.common.usecases import Services
+from app.infrastructure.usecases.usecases import Services
 from .responses.health import HealthStatus, Status
 
 logger = logging.getLogger('http.health')
@@ -24,6 +24,7 @@ router = APIRouter(
     description='Get health status',
     summary='Работоспособность сервиса',
 )
+@inject
 async def get_health_status(
     config: FromDishka[Config],
 ):

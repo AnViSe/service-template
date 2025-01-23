@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 from app.core.config import config
 from app.domain.auth.dto import AuthDto
-from app.domain.common.usecases import Services
+from app.infrastructure.usecases.usecases import Services
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f'{config.auth.api_url}/signin')
 

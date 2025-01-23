@@ -1,4 +1,11 @@
-from .base import ConflictException, CustomException, IdNotFoundException, RequestInvalid, UnauthorizedException
+from .base import (
+    ConflictException,
+    CustomException,
+    IdNotFoundException,
+    NotFoundException,
+    RequestInvalid,
+    UnauthorizedException
+)
 from .repository import (
     ArgumentException,
     AttributeException,
@@ -17,6 +24,7 @@ __all__ = [
     'ConnectEstablishingException',
     'CustomException',
     'IdNotFoundException',
+    'NotFoundException',
     'RepositoryException',
     'RequestInvalid',
     'TypeException',

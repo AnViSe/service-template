@@ -13,7 +13,7 @@ from app.domain.user.model import UserModel
 from app.infrastructure.database import exception_mapper
 
 if TYPE_CHECKING:
-    from app.domain.common.usecases import Services
+    from app.infrastructure.usecases.usecases import Services
 
 logger = logging.getLogger('service.auth')
 

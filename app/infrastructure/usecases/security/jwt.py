@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, UTC
 import jwt
 
 from app.core.config import AuthConfig
-from app.domain.common import exceptions
+from app.domain.auth.exceptions import TokenExpired, TokenInvalid
 
 
 class JWT:
@@ -54,9 +54,9 @@ class JWT:
         try:
             payload = jwt.decode(token, key, algorithms=[self.auth.algorithm])
         except jwt.exceptions.ExpiredSignatureError:
-            raise exceptions.TokenExpired
+            raise TokenExpired
         except jwt.exceptions.PyJWTError:
-            raise exceptions.TokenInvalid
+            raise TokenInvalid
         return payload
 
     def __encode(self, payload: dict, key: str) -> str:

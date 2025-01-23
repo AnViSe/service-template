@@ -4,6 +4,7 @@ from pydantic import BaseModel, EmailStr
 
 from app.domain.common import dto as common_dto
 from .fields import (
+    LastLoginOptionalField,
     SubdivisionIdOptionalField,
     SubdivisionNameOptionalField,
     UserAvatarOptionalField,
@@ -20,7 +21,7 @@ class UserProfileDto(common_dto.DTO, common_dto.IDModelMixin):
     user_avatar: str | None = UserAvatarOptionalField
     sd_id: int | None = SubdivisionIdOptionalField
     sd_name: str | None = SubdivisionNameOptionalField
-    last_login: datetime | None
+    last_login: datetime | None = LastLoginOptionalField
 
 
 class UserProfileDataDto(BaseModel):

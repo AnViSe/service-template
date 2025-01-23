@@ -14,7 +14,7 @@ from app.domain.permission.model import PermissionModel
 from app.infrastructure.database.exception_mapper import exception_mapper
 
 if TYPE_CHECKING:
-    from app.domain.common.usecases import Services
+    from app.infrastructure.usecases.usecases import Services
 
 logger = logging.getLogger(__name__)
 

@@ -9,7 +9,7 @@ from starlette import status
 
 from app.domain.auth import dto as auth_dto
 from app.domain.auth.exceptions import PasswordWrong
-from app.domain.common.usecases import Services
+from app.infrastructure.usecases.usecases import Services
 from ..deps import CurrentUser
 
 router = APIRouter(tags=['Авторизация'])

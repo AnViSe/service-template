@@ -4,7 +4,7 @@ from dishka import FromDishka
 from dishka.integrations.fastapi import inject
 from fastapi import APIRouter, Depends, status
 
-from app.domain.common.usecases import Services
+from app.infrastructure.usecases.usecases import Services
 from app.domain.user import dto as user_dto
 from .helper import QueryParams
 from .responses.base import DeleteResultSuccess

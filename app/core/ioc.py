@@ -1,6 +1,6 @@
 from dishka import from_context, provide, Provider, Scope
 
-from app.domain.common.usecases import Services
+from app.infrastructure.usecases import Services
 from .config import Config
 from ..infrastructure.database import Adapters
 
