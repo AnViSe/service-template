@@ -18,6 +18,6 @@ class UserCreateRequest(BaseModel):
     sd_id: int | None = SubdivisionIdOptionalField
     user_avatar: str | None = UserAvatarOptionalField
     user_desc: str | None = UserDescOptionalField
-    # roles: list[int] | None
-    # permissions: list[int] | None
+    roles: list[int] | None
+    permissions: list[int] | None
     status: bool = common_dto.StatusField

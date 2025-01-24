@@ -1,6 +1,6 @@
 from .base import DTO
 from .fields import IdField, StatusField
-from .mixins import DtCrUpModelMixin, IDModelMixin, StatusModelMixin
+from .mixins import DtCrUpModelMixin, IDModelMixin, PermissionsIntMixin, RolesIntMixin, StatusModelMixin, UsersIntMixin
 from .pagination import PaginatedItemsDTO
 
 __all__ = [
@@ -9,6 +9,9 @@ __all__ = [
     'DTO',
     'IDModelMixin',
     'PaginatedItemsDTO',
+    'PermissionsIntMixin',
+    'RolesIntMixin',
     'StatusField',
     'StatusModelMixin',
+    'UsersIntMixin',
 ]

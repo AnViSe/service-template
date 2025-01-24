@@ -17,8 +17,8 @@ class UserModel(Aggregate):
 
     sd_id: int | None
 
-    # roles: list[int] | None
-    # permissions: list[int] | None
+    roles: list[int] | None
+    permissions: list[int] | None
 
     @classmethod
     def create(
@@ -26,8 +26,8 @@ class UserModel(Aggregate):
         user_name: str,
         user_mail: EmailStr | None,
         sd_id: int | None,
-        # roles: list[int] | None,
-        # permissions: list[int] | None,
+        roles: list[int] | None,
+        permissions: list[int] | None,
         user_desc: str | None = None,
         user_avatar: str | None = None,
         user_pass: str | None = None,
@@ -41,8 +41,8 @@ class UserModel(Aggregate):
             user_desc=user_desc,
             user_avatar=user_avatar,
             sd_id=sd_id,
-            # roles=roles,
-            # permissions=permissions,
+            roles=roles if roles is not None else [],
+            permissions=permissions if permissions is not None else [],
             dt_cr=None,
             dt_up=None,
             status=status,

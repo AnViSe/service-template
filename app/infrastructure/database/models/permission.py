@@ -1,8 +1,9 @@
 from sqlalchemy import Index, String, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.domain.permission.model import PermissionModel
 from app.infrastructure.database.models import DatabaseModel, DtCrUpModel, int_pk_always_true, OwnerModel
+from app.infrastructure.database.models.relations import users_perms
 
 
 class PermissionDB(OwnerModel, DtCrUpModel, DatabaseModel):
@@ -15,6 +16,13 @@ class PermissionDB(OwnerModel, DtCrUpModel, DatabaseModel):
     perm_code: Mapped[str] = mapped_column(String(100), nullable=False, comment='Код разрешения')
     perm_name: Mapped[str] = mapped_column(String(150), nullable=False, comment='Имя разрешения')
     perm_desc: Mapped[str | None] = mapped_column(String(200), nullable=True, comment='Описание разрешения')
+
+    # roles: Mapped[list['RoleDB']] = relationship(
+    #     'RoleDB', secondary=roles_perms, back_populates='permissions', order_by='RoleDB.role_code'
+    # )
+    users: Mapped[list['UserDB']] = relationship(
+        'UserDB', secondary=users_perms, back_populates='permissions', order_by='UserDB.user_name'
+    )
 
     def get_id(self) -> int | None:
         return self.id

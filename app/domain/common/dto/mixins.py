@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from .fields import DtCrField, DtUpOptionalField, IdField, StatusField
+from .fields import DtCrField, DtUpOptionalField, IdField, ItemsOptionalField, StatusField
 
 
 class DtCrUpModelMixin(BaseModel):
@@ -17,21 +17,21 @@ class StatusModelMixin(BaseModel):
 class IDModelMixin(BaseModel):
     id: int = IdField
 
+
 # class IDWithZeroModelMixin(BaseModel):
 #     id: int = IdWithZeroField
 
 
-# class PermissionsIntMixin(BaseModel):
-#     permissions: list[int] | None = ItemsOptionalField
+class PermissionsIntMixin(BaseModel):
+    permissions: list[int] | None = ItemsOptionalField
 
 
-# class RolesIntMixin(BaseModel):
-#     roles: list[int] | None = ItemsOptionalField
+class RolesIntMixin(BaseModel):
+    roles: list[int] | None = ItemsOptionalField
 
 
-# class UsersIntMixin(BaseModel):
-#     users: list[int] | None = ItemsOptionalField
-
+class UsersIntMixin(BaseModel):
+    users: list[int] | None = ItemsOptionalField
 
 # class SubdivisionMixin(BaseModel):
 #     sd_name: str | None = SDNameOptionalField

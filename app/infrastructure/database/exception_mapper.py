@@ -52,11 +52,11 @@ def exception_mapper(
         except TimeoutError as e:
             logger.error('TimeoutError', extra={'error': repr(e)})
             raise exceptions.ConnectEstablishingException from e
-        except AttributeError as e:
-            logger.error('AttributeError', extra={'error': repr(e)})
-            raise exceptions.AttributeException(str(e))
-        except TypeError as e:
-            logger.error('TypeError', extra={'error': repr(e)})
-            raise exceptions.TypeException(str(e))
+        # except AttributeError as e:
+        #     logger.error('AttributeError', extra={'error': repr(e)})
+        #     raise exceptions.AttributeException(str(e))
+        # except TypeError as e:
+        #     logger.error('TypeError', extra={'error': repr(e)})
+        #     raise exceptions.TypeException(str(e))
 
     return wrapped

@@ -2,11 +2,12 @@ from datetime import datetime
 from secrets import token_urlsafe
 
 from sqlalchemy import DateTime, Index, Integer, String, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.domain.user.model import UserModel
 from app.infrastructure.database.models import DatabaseModel, int_pk_always_true, OwnerModel
 from app.infrastructure.database.models.columns import datetime_ac, datetime_cr, datetime_up_no_update
+from app.infrastructure.database.models.relations import users_perms, users_roles
 
 
 class UserDB(DatabaseModel, OwnerModel):
@@ -32,12 +33,12 @@ class UserDB(DatabaseModel, OwnerModel):
         String(100), unique=True, nullable=True, comment='Проверочный код'
     )
 
-    # roles: Mapped[list['RoleDB']] = relationship(
-    #     'RoleDB', secondary=users_roles, back_populates='users', order_by='RoleDB.role_code'
-    # )
-    # permissions: Mapped[list['PermissionDB']] = relationship(
-    #     'PermissionDB', secondary=users_perms, back_populates='users', order_by='PermissionDB.perm_code'
-    # )
+    roles: Mapped[list['RoleDB']] = relationship(
+        'RoleDB', secondary=users_roles, back_populates='users', order_by='RoleDB.role_code'
+    )
+    permissions: Mapped[list['PermissionDB']] = relationship(
+        'PermissionDB', secondary=users_perms, back_populates='users', order_by='PermissionDB.perm_code'
+    )
 
     dt_ac: Mapped[datetime_ac]
     dt_cr: Mapped[datetime_cr]
@@ -55,8 +56,8 @@ class UserDB(DatabaseModel, OwnerModel):
             user_pass=self.user_pass,
             user_desc=self.user_desc,
             user_avatar=self.user_avatar,
-            # roles=[role.id for role in self.roles],
-            # permissions=[permission.id for permission in self.permissions],
+            roles=[role.id for role in self.roles],
+            permissions=[permission.id for permission in self.permissions],
             dt_cr=self.dt_cr,
             dt_up=self.dt_up,
             status=self.status

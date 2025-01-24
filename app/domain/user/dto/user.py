@@ -2,6 +2,7 @@ from typing import TypeAlias
 
 from pydantic import EmailStr
 
+from app.domain.circulars import ExtUser
 from app.domain.common import dto as common_dto
 from .fields import (
     SubdivisionIdOptionalField,
@@ -36,6 +37,7 @@ class UserFullDto(
     common_dto.StatusModelMixin,
     common_dto.DtCrUpModelMixin,
     LastLoginMixin,
+    ExtUser,
     BaseUser,
     common_dto.IDModelMixin,
 ):
@@ -49,6 +51,8 @@ class UserCredentialCodes(common_dto.DTO):
 
 class UserDataDto(
     common_dto.StatusModelMixin,
+    common_dto.PermissionsIntMixin,
+    common_dto.RolesIntMixin,
     BaseUser,
 ):
     ...

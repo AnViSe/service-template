@@ -1,3 +1,4 @@
+import logging
 from typing import Generic, TypeVar
 
 from sqlalchemy.orm import Mapped
@@ -6,6 +7,7 @@ from app.domain.common.models.base import AbstractDomainModel
 from .base import Base
 from .columns import bool_status, datetime_cr, datetime_up, int_pk_always_true, owner_cr, owner_up
 
+logger = logging.getLogger('db.models')
 
 class OwnerModel:
     __abstract__ = True

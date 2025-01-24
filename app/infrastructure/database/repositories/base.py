@@ -21,7 +21,7 @@ from sqlalchemy import (
     text,
 )
 from sqlalchemy.exc import DBAPIError, IntegrityError
-from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
 from app.domain.common.exceptions import IdNotFoundException
 from app.domain.common.models.base import AbstractDomainModel
@@ -48,6 +48,11 @@ class BaseRepository(Generic[AbstractDatabaseModel], metaclass=ABCMeta):
         self.order_fields: list[str] = ['id']
 
         self.sql_select = select(self.database_model)
+
+    @staticmethod
+    async def get_relations(sql: SelectType, session: AsyncSession):
+        items = await session.scalars(sql)
+        return items.all()
 
     # def transaction(self, method):
     #     @wraps(method)

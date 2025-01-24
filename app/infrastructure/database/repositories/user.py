@@ -3,6 +3,7 @@ import logging
 from sqlalchemy import select
 from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.orm import subqueryload
 
 from app.domain.common.exceptions import IdNotFoundException
 from app.domain.user import dto as user_dto
@@ -13,6 +14,8 @@ from app.domain.user.exceptions import (
     UserNameAlreadyExists,
 )
 from app.domain.user.model import UserModel
+from app.infrastructure.database.models.permission import PermissionDB
+from app.infrastructure.database.models.role import RoleDB
 from app.infrastructure.database.models.user import UserDB
 from app.infrastructure.database.repositories import BaseRepository
 
@@ -33,8 +36,8 @@ class UserRepository(BaseRepository[UserDB]):
     async def get_full_by_id(self, item_id: int) -> user_dto.UserFullDto:
         sql = (
             select(UserDB)
-            # .options(subqueryload(UserDB.roles))
-            # .options(subqueryload(UserDB.permissions))
+            .options(subqueryload(UserDB.roles))
+            .options(subqueryload(UserDB.permissions))
             .where(UserDB.id == item_id)
         )
         async with self.session_maker() as session:
@@ -71,6 +74,8 @@ class UserRepository(BaseRepository[UserDB]):
     async def update(self, item_id: int, model: UserModel, owner_id: int | None = None) -> None:
         sql_select = (
             select(UserDB)
+            .options(subqueryload(UserDB.roles))
+            .options(subqueryload(UserDB.permissions))
             .where(UserDB.id == item_id)
         )
         async with self.session_maker.begin() as session:
@@ -79,6 +84,16 @@ class UserRepository(BaseRepository[UserDB]):
                 raise UserIdNotFound(item_id)
             db_model.update_from_domain_model(model)
             db_model.owner_up = owner_id
+            if model.roles is not None:
+                db_model.roles = await self.get_relations(
+                    select(RoleDB).where(RoleDB.id.in_(model.roles)),
+                    session,
+                )
+            if model.permissions is not None:
+                db_model.permissions = await self.get_relations(
+                    select(PermissionDB).where(PermissionDB.id.in_(model.roles)),
+                    session,
+                )
             try:
                 await session.flush()
                 await session.commit()

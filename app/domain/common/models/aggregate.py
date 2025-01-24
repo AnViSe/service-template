@@ -1,9 +1,11 @@
+import logging
 from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime
 
 from app.domain.common.models.entity import Entity
 
+logger = logging.getLogger('aggregate')
 
 @dataclass
 class Aggregate(Entity, ABC):
