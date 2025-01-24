@@ -25,10 +25,11 @@ class SignUpDto(common_dto.DTO):
 class AuthDto(common_dto.DTO):
     id: int = common_dto.IdField
     user_name: str = user_dto.UserNameField
-    user_pass: str = user_dto.UserPassField
+    user_pass: str | None = user_dto.UserPassOptionalField
     user_mail: EmailStr | None = user_dto.UserMailOptionalField
     sd_id: int | None = user_dto.SubdivisionIdOptionalField
     status: bool = common_dto.StatusField
+
 
 class ResetDto(common_dto.DTO):
     id: int = common_dto.IdField

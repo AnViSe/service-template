@@ -1,4 +1,4 @@
-from app.domain.common.exceptions import NotFoundException, RequestInvalid, UnauthorizedException
+from app.domain.common.exceptions import NotFoundException, RequestInvalidException, UnauthorizedException
 
 
 class UserNotActive(UnauthorizedException):
@@ -6,7 +6,7 @@ class UserNotActive(UnauthorizedException):
         super().__init__(f'User with name=<{user_name}> is not active')
 
 
-class UserMailNotVerified(RequestInvalid):
+class UserMailNotVerified(RequestInvalidException):
     def __init__(self, user_mail: str):
         super().__init__(f'User with email=<{user_mail}> is not verified')
 

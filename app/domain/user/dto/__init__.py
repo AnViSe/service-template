@@ -6,6 +6,7 @@ from .fields import (
     UserPassField,
     UserPassNewField,
     UserPassOldField,
+    UserPassOptionalField,
 )
 from .request import UserCreateRequest
 from .user import UserDataDto, UserDescOptionalField, UserDto, UserFullDto, UsersDto
@@ -23,5 +24,6 @@ __all__ = [
     'UserPassField',
     'UserPassNewField',
     'UserPassOldField',
+    'UserPassOptionalField',
     'UsersDto',
 ]

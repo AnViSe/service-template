@@ -10,7 +10,7 @@ from starlette import status
 from app.domain.auth import dto as auth_dto
 from app.domain.auth.exceptions import PasswordWrong
 from app.infrastructure.usecases.usecases import Services
-from ..deps import CurrentUser
+from ..deps import CurrentUserAuth
 
 router = APIRouter(tags=['Авторизация'])
 
@@ -91,7 +91,7 @@ async def refresh_token(
 @inject
 async def password_change(
     passwords: auth_dto.PasswordChangeRequest,
-    user: CurrentUser,
+    user: CurrentUserAuth,
     service: FromDishka[Services],
 ):
     if service.security.pwd.check_pwd(passwords.password_old, user.user_pass):

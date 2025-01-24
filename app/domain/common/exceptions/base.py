@@ -1,24 +1,25 @@
 class CustomException(Exception):
-    def __init__(self, message: str, internal_code: int = 0, http_code: int = 500):
+    def __init__(self, name: str, message: str, http_code: int = 500, internal_code: int = 0):
         super().__init__(message)
-        self.internal_code = internal_code
-        self.http_code = http_code
+        self.error = name
         self.message = message
+        self.http_code = http_code
+        self.internal_code = internal_code
 
 
-class RequestInvalid(CustomException):
+class RequestInvalidException(CustomException):
     def __init__(self, message: str = 'Request Invalid'):
-        super().__init__(message, internal_code=0, http_code=400)
+        super().__init__('RequestInvalidException', message, http_code=400)
 
 
 class UnauthorizedException(CustomException):
     def __init__(self, message: str = 'Unauthorized'):
-        super().__init__(message, internal_code=0, http_code=401)
+        super().__init__('UnauthorizedException', message, http_code=401)
 
 
 class NotFoundException(CustomException):
     def __init__(self, message: str = 'Not Found'):
-        super().__init__(message, internal_code=0, http_code=404)
+        super().__init__('NotFoundException', message, http_code=404)
 
 
 class IdNotFoundException(CustomException):
@@ -37,7 +38,7 @@ class IdNotFoundException(CustomException):
     """
 
     def __init__(self, item_id: int, message: str | None = None):
-        super().__init__(message, internal_code=0, http_code=404)
+        super().__init__('IdNotFoundException', message, http_code=404)
         if message is None:
             self.message = f'Item with id:<{item_id}> not found'
         else:
@@ -46,4 +47,4 @@ class IdNotFoundException(CustomException):
 
 class ConflictException(CustomException):
     def __init__(self, message: str = 'Conflict'):
-        super().__init__(message, internal_code=0, http_code=409)
+        super().__init__('ConflictException', message, http_code=409)

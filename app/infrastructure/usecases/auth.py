@@ -6,8 +6,8 @@ from app.domain.auth.exceptions import (
     PasswordWrong,
     TokenPayload,
     TokenPayloadUser,
-    TokenPayloadUserId,
-    UserMailNotVerified, UserNotActive,
+    UserMailNotVerified,
+    UserNotActive,
 )
 from app.domain.user.model import UserModel
 from app.infrastructure.database import exception_mapper
@@ -69,13 +69,21 @@ class AuthService:
         user = await self.service.adapters.postgres.auth.verify_by_code(code)
         await self.service.adapters.postgres.auth.update_password(user.id, password)
 
+    # @exception_mapper
+    # async def current_user_by_token(self, token: str) -> auth_dto.AuthDto:
+    #     if (payload := self.service.security.jwt.decode_access_token(token)) is None:
+    #         raise TokenPayload
+    #     if (data := payload.get('user')) is None:
+    #         raise TokenPayloadUser
+    #     if (ident := data.get('id')) is None:
+    #         raise TokenPayloadUserId
+    #     if (user := await self.service.adapters.postgres.auth.get_auth_by_id(ident)) is not None:
+    #         return user
+
     @exception_mapper
-    async def current_user_by_token(self, token: str) -> auth_dto.AuthDto:
+    async def user_auth_by_token(self, token: str) -> auth_dto.AuthDto:
         if (payload := self.service.security.jwt.decode_access_token(token)) is None:
             raise TokenPayload
         if (data := payload.get('user')) is None:
             raise TokenPayloadUser
-        if (ident := data.get('id')) is None:
-            raise TokenPayloadUserId
-        if (user := await self.service.adapters.postgres.auth.get_auth_by_id(ident)) is not None:
-            return user
+        return auth_dto.AuthDto.model_validate(data)

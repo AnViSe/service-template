@@ -33,21 +33,36 @@ class UserService:
         )
 
     @exception_mapper
-    async def create(self, item: user_dto.UserCreateRequest) -> user_dto.UserFullDto:
+    async def create(
+        self,
+        item: user_dto.UserCreateRequest,
+        owner_id: int | None = None,
+    ) -> user_dto.UserFullDto:
         new_model = UserModel.create(**item.model_dump())
         new_model.user_pass = self.service.security.pwd.hash_pwd(new_model.user_pass)
-        item_created_id = await self.service.adapters.postgres.user.create_get_id(new_model)
+        item_created_id = await self.service.adapters.postgres.user.create_get_id(new_model, owner_id)
         item_created = await self.service.adapters.postgres.user.get_full_by_id(item_created_id)
         await self.service.adapters.bus.publish('user_created', item_created)
         return item_created
 
     @exception_mapper
-    async def update(self, item_id: int, item_data: user_dto.UserDataDto) -> user_dto.UserFullDto:
+    async def update(
+        self,
+        item_id: int,
+        item_data: user_dto.UserDataDto,
+        owner_id: int | None = None,
+    ) -> user_dto.UserFullDto:
         new_model = UserModel.create(**item_data.model_dump())
-        await self.service.adapters.postgres.user.update(item_id, new_model)
+        await self.service.adapters.postgres.user.update(item_id, new_model, owner_id)
         item_updated = await self.service.adapters.postgres.user.get_full_by_id(item_id)
+        await self.service.adapters.bus.publish('user_updated', item_updated)
         return item_updated
 
     @exception_mapper
-    async def delete(self, item_id: int):
-        await self.service.adapters.postgres.user.delete(item_id)
+    async def delete(
+        self,
+        item_id: int,
+        owner_id: int | None = None,
+    ) -> None:
+        await self.service.adapters.postgres.user.delete(item_id, owner_id)
+        await self.service.adapters.bus.publish('user_deleted', item_id)

@@ -3,7 +3,7 @@ from .base import (
     CustomException,
     IdNotFoundException,
     NotFoundException,
-    RequestInvalid,
+    RequestInvalidException,
     UnauthorizedException
 )
 from .repository import (
@@ -26,7 +26,7 @@ __all__ = [
     'IdNotFoundException',
     'NotFoundException',
     'RepositoryException',
-    'RequestInvalid',
+    'RequestInvalidException',
     'TypeException',
     'UnauthorizedException',
     'UndefinedColumnException',

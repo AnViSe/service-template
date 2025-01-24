@@ -1,6 +1,5 @@
 import logging
 from abc import ABCMeta
-from collections.abc import Sequence
 from datetime import datetime
 from typing import Generic, Type, TypeVar
 
@@ -9,7 +8,6 @@ from sqlalchemy import (
     and_,
     Boolean,
     cast,
-    ColumnElement,
     CTE,
     DateTime,
     delete,
@@ -26,13 +24,12 @@ from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.domain.common.exceptions import IdNotFoundException
-from app.domain.common.exceptions.base import NotFoundException
 from app.domain.common.models.base import AbstractDomainModel
 from app.infrastructure.database.models import AbstractDatabaseModel
 
-SelectType = TypeVar('SelectType', Select, CTE)
-
 logger = logging.getLogger('repository.base')
+
+SelectType = TypeVar('SelectType', Select, CTE)
 
 
 class BaseRepository(Generic[AbstractDatabaseModel], metaclass=ABCMeta):
@@ -40,9 +37,11 @@ class BaseRepository(Generic[AbstractDatabaseModel], metaclass=ABCMeta):
         self,
         model: Type[AbstractDatabaseModel],
         session_maker: async_sessionmaker,
+        # owner: CurrentUserAuth,
     ):
         self.database_model = model
         self.session_maker = session_maker
+        # self.owner = owner
 
         self.select_columns: dict = {}
         self.filter_fields: list[str] = []
@@ -64,68 +63,65 @@ class BaseRepository(Generic[AbstractDatabaseModel], metaclass=ABCMeta):
     #
     #     return wrapped
 
-    async def base_create(self, model: AbstractDomainModel) -> AbstractDatabaseModel:
-        db_model = self.database_model.create_from_domain_model(model)
-        async with self.session_maker.begin() as session:
-            session.add(db_model)
-            try:
-                await session.flush()
-                await session.commit()
-            except IntegrityError as e:
-                self._parse_error(e, model)
-            return db_model
+    # async def base_create(self, model: AbstractDomainModel) -> AbstractDatabaseModel:
+    #     db_model = self.database_model.create_from_domain_model(model)
+    #     async with self.session_maker.begin() as session:
+    #         session.add(db_model)
+    #         try:
+    #             await session.flush()
+    #             await session.commit()
+    #         except IntegrityError as e:
+    #             self._parse_error(e, model)
+    #         return db_model
 
-    async def base_create_get_id(self, model: AbstractDomainModel) -> int:
-        db_model = self.database_model.create_from_domain_model(model)
-        # Start and commit transaction manually, rollback by default
-        async with self.session_maker.begin() as session:
-            session.add(db_model)
-            try:
-                await session.flush()
-                await session.commit()
-                return db_model.get_id()
-            except IntegrityError as e:
-                self._parse_error(e, model)
-
-    async def base_update(self, item_id: int, model: AbstractDomainModel) -> None:
-        self.sql_select.where(and_(self.database_model.id == item_id))
-        async with self.session_maker.begin() as session:
-            item = await session.scalar(self.sql_select)
-            if not item:
-                raise IdNotFoundException(item_id)
-            item.update_from_domain_model(model)
-            try:
-                await session.flush()
-                await session.commit()
-            except IntegrityError as e:
-                self._parse_error(e, model)
-
-    async def base_get_one(
-        self,
-        item_id: int | None = None,
-        where_clause: list[ColumnElement[bool] | bool] | None = None,
-    ) -> AbstractDatabaseModel:
-        # Start transaction and rollback by default
+    async def base_create_get_id(self, model: AbstractDatabaseModel) -> int:
         async with self.session_maker() as session:
-            if item_id is not None:
-                self.sql_select.where(and_(self.database_model.id == item_id))
-                item = await session.scalar(self.sql_select)
-                if not item:
-                    raise IdNotFoundException(item_id)
-                else:
-                    return item
-            if where_clause is not None:
-                self.sql_select.where(and_(*where_clause))
-                item = await session.scalar(self.sql_select)
-                if not item:
-                    raise NotFoundException
-                else:
-                    return item
+            session.add(model)
+            try:
+                await session.flush()
+                await session.commit()
+                return model.get_id()
+            except IntegrityError as e:
+                self._parse_error(e, model)
 
-    async def base_get_all(self) -> Sequence[AbstractDatabaseModel]:
-        async with self.session_maker() as session:
-            _exec = await session.scalars(self.sql_select)
-            return _exec.all()
+    # async def base_update(self, item_id: int, model: AbstractDomainModel) -> None:
+    #     self.sql_select.where(and_(self.database_model.id == item_id))
+    #     async with self.session_maker.begin() as session:
+    #         item = await session.scalar(self.sql_select)
+    #         if not item:
+    #             raise IdNotFoundException(item_id)
+    #         item.update_from_domain_model(model)
+    #         try:
+    #             await session.flush()
+    #             await session.commit()
+    #         except IntegrityError as e:
+    #             self._parse_error(e, model)
+
+    # async def base_get_one(
+    #     self,
+    #     item_id: int | None = None,
+    #     where_clause: list[ColumnElement[bool] | bool] | None = None,
+    # ) -> AbstractDatabaseModel:
+    #     async with self.session_maker() as session:
+    #         if item_id is not None:
+    #             self.sql_select.where(and_(self.database_model.id == item_id))
+    #             item = await session.scalar(self.sql_select)
+    #             if not item:
+    #                 raise IdNotFoundException(item_id)
+    #             else:
+    #                 return item
+    #         if where_clause is not None:
+    #             self.sql_select.where(and_(*where_clause))
+    #             item = await session.scalar(self.sql_select)
+    #             if not item:
+    #                 raise NotFoundException
+    #             else:
+    #                 return item
+
+    # async def base_get_all(self) -> Sequence[AbstractDatabaseModel]:
+    #     async with self.session_maker() as session:
+    #         _exec = await session.scalars(self.sql_select)
+    #         return _exec.all()
 
     async def base_delete(self, item_id: int) -> None:
         sql = (

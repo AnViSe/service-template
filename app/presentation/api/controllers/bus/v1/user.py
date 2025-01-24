@@ -4,7 +4,7 @@ from dishka import FromDishka
 from faststream.redis import RedisRouter, StreamSub
 
 from app.core.config import config
-from app.infrastructure.usecases.usecases import Services
+from app.infrastructure.usecases import Services
 from app.domain.user.dto import UserFullDto
 
 logger = logging.getLogger('sub.user')

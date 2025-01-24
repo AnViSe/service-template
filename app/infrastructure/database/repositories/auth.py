@@ -9,7 +9,7 @@ from app.domain.auth import dto as auth_dto
 from app.domain.auth.exceptions import VerificationCodeNotFound
 from app.domain.user.exceptions import UserIdNotFound, UserMailNotFound, UserNameNotFound
 from app.infrastructure.database.models.user import UserDB
-from app.infrastructure.database.repositories import BaseRepository
+from app.infrastructure.database.repositories.base import BaseRepository
 
 logger = logging.getLogger('repository.auth')
 
@@ -30,7 +30,7 @@ class AuthRepository(BaseRepository[UserDB]):
             )
             .where(
                 UserDB.id == user_id
-                )
+            )
         )
         async with self.session_maker() as session:
             _exec = await session.execute(sql)
@@ -115,6 +115,14 @@ class AuthRepository(BaseRepository[UserDB]):
             if item is None:
                 raise VerificationCodeNotFound
             return auth_dto.VerifyDto.model_validate(item)
+
+    async def get_user_role_codes_by_id(self, user_id: int) -> list[str]:
+        codes = ['test']
+        return codes
+
+    async def get_user_permission_codes_by_id(self, user_id: int) -> list[str]:
+        codes = ['test']
+        return codes
 
     async def update_last_login(self, user_id: int) -> None:
         sql = (

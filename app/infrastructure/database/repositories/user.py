@@ -23,22 +23,22 @@ class UserRepository(BaseRepository[UserDB]):
     def __init__(self, session_maker: async_sessionmaker):
         super().__init__(model=UserDB, session_maker=session_maker)
 
-    async def get_by_id(self, item_id: int) -> user_dto.UserDto:
-        try:
-            db_model = await self.base_get_one(item_id=item_id)
-            return user_dto.UserDto.model_validate(db_model)
-        except IdNotFoundException as e:
-            raise UserIdNotFound(item_id) from e
+    # async def get_by_id(self, item_id: int) -> user_dto.UserDto:
+    #     try:
+    #         db_model = await self.base_get_one(item_id=item_id)
+    #         return user_dto.UserDto.model_validate(db_model)
+    #     except IdNotFoundException as e:
+    #         raise UserIdNotFound(item_id) from e
 
     async def get_full_by_id(self, item_id: int) -> user_dto.UserFullDto:
-        self.sql_select = (
+        sql = (
             select(UserDB)
             # .options(subqueryload(UserDB.roles))
             # .options(subqueryload(UserDB.permissions))
             .where(UserDB.id == item_id)
         )
         async with self.session_maker() as session:
-            db_model = await session.scalar(self.sql_select)
+            db_model = await session.scalar(sql)
             if not db_model:
                 raise UserIdNotFound(item_id)
             return user_dto.UserFullDto.model_validate(db_model)
@@ -63,21 +63,31 @@ class UserRepository(BaseRepository[UserDB]):
 
         return await self.select_many(sql, **kwargs)
 
-    async def create_get_id(self, model: UserModel) -> int:
+    async def create_get_id(self, model: UserModel, owner_id: int | None = None) -> int:
         db_model = UserDB.create_from_domain_model(model)
+        db_model.owner_cr = owner_id
+        return await self.base_create_get_id(db_model)
 
-        async with self.session_maker() as session:
-            session.add(db_model)
+    async def update(self, item_id: int, model: UserModel, owner_id: int | None = None) -> None:
+        sql_select = (
+            select(UserDB)
+            .where(UserDB.id == item_id)
+        )
+        async with self.session_maker.begin() as session:
+            db_model = await session.scalar(sql_select)
+            if not db_model:
+                raise UserIdNotFound(item_id)
+            db_model.update_from_domain_model(model)
+            db_model.owner_up = owner_id
             try:
                 await session.flush()
                 await session.commit()
-                return db_model.id
             except IntegrityError as e:
                 self._parse_error(e, model)
 
-    async def delete(self, item_id: int) -> None:
+    async def delete(self, item_id: int, owner_id: int | None = None) -> None:
         try:
-            await super().base_delete(item_id)
+            await self.base_delete(item_id)
         except IdNotFoundException:
             raise UserIdNotFound(item_id)
 

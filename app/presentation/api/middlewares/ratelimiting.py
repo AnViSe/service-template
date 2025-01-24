@@ -3,10 +3,12 @@ from datetime import datetime, timedelta
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from ..controllers.http.v1.responses.base import BaseErrorResponse
+
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     RATE_LIMIT_DURATION = timedelta(minutes=1)
-    RATE_LIMIT_REQUESTS = 10
+    RATE_LIMIT_REQUESTS = 1000
 
     def __init__(self, app):
         super().__init__(app)
@@ -31,7 +33,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                 # If the request count exceeds the rate limit, return a JSON response with an error message
                 return JSONResponse(
                     status_code=429,
-                    content={'message': 'Rate limit exceeded. Please try again later.'}
+                    content=BaseErrorResponse(
+                        error='RequestLimitError',
+                        message='Rate limit exceeded. Please try again later.'
+                    ).model_dump(exclude_none=True)
                 )
             request_count += 1
 
@@ -41,4 +46,3 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         # Proceed with the request
         response = await call_next(request)
         return response
-

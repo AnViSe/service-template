@@ -1,10 +1,11 @@
 import logging
 
-from sqlalchemy import and_, select
-from sqlalchemy.exc import DBAPIError
+from sqlalchemy import select
+from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.domain.common.exceptions import IdNotFoundException
+from app.domain.permission import dto as perm_dto
 from app.domain.permission.exceptions import (
     PermissionCodeAlreadyExists,
     PermissionIdAlreadyExists,
@@ -21,16 +22,18 @@ class PermissionRepository(BaseRepository[PermissionDB]):
     def __init__(self, session_maker: async_sessionmaker):
         super().__init__(model=PermissionDB, session_maker=session_maker)
 
-    async def retrieve_one(self, item_id: int | None = None, ) -> PermissionDB | None:
-        sql = select(self.database_model).where(and_(self.database_model.id == item_id))
+    async def get_full_by_id(self, item_id: int) -> perm_dto.PermissionFullDto:
+        sql = (
+            select(PermissionDB)
+            .where(PermissionDB.id == item_id)
+        )
         async with self.session_maker() as session:
-            item = await session.scalar(sql)
-            if not item:
+            db_model = await session.scalar(sql)
+            if not db_model:
                 raise PermissionIdNotFound(item_id)
-            else:
-                return item
+            return perm_dto.PermissionFullDto.model_validate(db_model)
 
-    async def retrieve_many(self, **kwargs):
+    async def get_many(self, **kwargs):
         self.order_fields = [f'{PermissionDB.__tablename__}.id']
 
         sql = (
@@ -47,9 +50,31 @@ class PermissionRepository(BaseRepository[PermissionDB]):
 
         return await self.select_many(sql, **kwargs)
 
-    async def delete(self, item_id: int) -> None:
+    async def create_get_id(self, model: PermissionModel, owner_id: int | None = None) -> int:
+        db_model = PermissionDB.create_from_domain_model(model)
+        db_model.owner_cr = owner_id
+        return await self.base_create_get_id(db_model)
+
+    async def update(self, item_id: int, model: PermissionModel, owner_id: int | None = None) -> None:
+        sql_select = (
+            select(PermissionDB)
+            .where(PermissionDB.id == item_id)
+        )
+        async with self.session_maker.begin() as session:
+            db_model = await session.scalar(sql_select)
+            if not db_model:
+                raise PermissionIdNotFound(item_id)
+            db_model.update_from_domain_model(model)
+            db_model.owner_up = owner_id
+            try:
+                await session.flush()
+                await session.commit()
+            except IntegrityError as e:
+                self._parse_error(e, model)
+
+    async def delete(self, item_id: int, owner_id: int | None = None) -> None:
         try:
-            await super().delete(item_id)
+            await self.base_delete(item_id)
         except IdNotFoundException:
             raise PermissionIdNotFound(item_id)
 
