@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.domain.common.exceptions import CustomException
 from app.presentation.api.controllers.http import handlers
-from .v1 import auth, permission, user, health
+from .v1 import auth, health, permission, role, user
 
 
 def setup_handlers(app: FastAPI):
@@ -19,3 +19,5 @@ router_http = APIRouter()
 router_http.include_router(health.router)
 router_http.include_router(auth.router)
 router_http.include_router(user.router)
+router_http.include_router(role.router)
+router_http.include_router(permission.router)

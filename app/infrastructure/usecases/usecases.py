@@ -1,6 +1,10 @@
 from app.core.config import Config
 from app.infrastructure.database import Adapters
-from app.infrastructure.usecases import AuthService, PermissionService, Security, UserService
+from app.infrastructure.usecases.auth import AuthService
+from app.infrastructure.usecases.permission import PermissionService
+from app.infrastructure.usecases.role import RoleService
+from app.infrastructure.usecases.security import Security
+from app.infrastructure.usecases.user import UserService
 
 
 class Services:
@@ -13,6 +17,7 @@ class Services:
         self.auth = AuthService(self)
 
         self.user = UserService(self)
+        self.role = RoleService(self)
         self.permission = PermissionService(self)
 
 
